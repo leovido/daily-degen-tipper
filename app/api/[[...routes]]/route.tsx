@@ -33,10 +33,10 @@ const app = new Frog<{ State: State }>({
 // Uncomment to use Edge Runtime
 // export const runtime = 'edge'
 
-const client = new NeynarAPIClient(process.env.NEYNAR_API_KEY ?? ""); 
+const client = new NeynarAPIClient(process.env.NEYNAR_API_KEY || ""); 
 
 app.frame('/', async (c) => {
-  const { buttonValue, buttonIndex, frameData, deriveState } = c
+  const { buttonIndex, frameData, deriveState } = c
 
   const allCasts = await client.fetchAllCastsCreatedByUser(frameData?.fid || 0, {
     limit: 100
@@ -137,14 +137,14 @@ app.frame('/', async (c) => {
       >
         <h1 style={{fontSize: 70, color: '#D6FFF6'}}>Who did I tip today?</h1>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          {groupedArray[state.count].map((u, index) => (
+          {groupedArray.length > 0 && groupedArray[state.count].map((u, index) => (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <p key={index} style={{fontFamily: "AvenirNext", fontSize: 35, color: '#D6FFF6'}}>
             {`${(5 * state.count) + index + 1}. @${u?.username} - ${u?.degenValue} at ${u?.timestamp} UTC`}
             </p>
           </div>
         ))}
-        {frameData !== undefined && <p style={{fontSize: 45, color: '#D6FFF6'}}>TOTAL today: {totalDegen} $DEGEN</p>}
+        {frameData !== undefined && <p style={{fontSize: 45, color: '#D6FFF6'}}>TOTAL: {totalDegen} $DEGEN</p>}
         </div>
       </div>
     ),
