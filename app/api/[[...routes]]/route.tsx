@@ -27,6 +27,14 @@ const app = new Frog<{ State: State }>({
   basePath: '/api',
   ui: { vars },
   // Supply a Hub to enable frame verification.
+  hub: {
+    apiUrl: "https://hubs.airstack.xyz",
+    fetchOptions: {
+      headers: {
+        "x-airstack-hubs": process.env.AIRSTACK_API_KEY || "",
+      }
+    }
+  }
   // hub: neynar({ apiKey: 'NEYNAR_FROG_FM' })
 })
 
