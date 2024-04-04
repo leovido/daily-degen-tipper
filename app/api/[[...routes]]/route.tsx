@@ -44,6 +44,9 @@ const client = new NeynarAPIClient(process.env.NEYNAR_API_KEY || "");
 app.frame('/', async (c) => {
   const { buttonIndex, frameData, deriveState } = c
 
+  const body = c.res(c.frameData)
+
+  console.warn(body, 'body')
   const allCasts = await client.fetchAllCastsCreatedByUser(frameData?.fid || 0, {
     limit: 100
   })
