@@ -6,7 +6,7 @@ import { devtools } from 'frog/dev'
 import { handle } from 'frog/next'
 import { serveStatic } from 'frog/serve-static'
 import { NeynarAPIClient } from "@neynar/nodejs-sdk";
-import { isWithinTimeRange } from "../../helper";
+import { isWithinTimeRange, isWithinTimeRangeLP } from "../../helper";
 import { vars } from '../../api/[[...routes]]/ui'
 
 interface FCUser {
