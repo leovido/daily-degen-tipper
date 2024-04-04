@@ -51,10 +51,12 @@ app.frame('/', async (c) => {
     const hours = castDate.getUTCHours()
     const minutes = castDate.getUTCMinutes()
 
+    const formattedTime = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+
     return {
       author: cast.parentAuthor,
       text: cast.text,
-      timestamp: `${hours}:${minutes}`
+      timestamp: `${formattedTime}`
     }
   })
   .map((cast) => {
@@ -136,6 +138,8 @@ app.frame('/', async (c) => {
         }}
       >
         <h1 style={{fontSize: 70, color: '#D6FFF6'}}>Who did I tip today?</h1>
+        {frameData === undefined && <h4 style={{fontSize: 35, color: '#D6FFF6'}}>by @leovido</h4>} 
+
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           {groupedArray.length > 0 && groupedArray[state.count].map((u, index) => (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -144,7 +148,11 @@ app.frame('/', async (c) => {
             </p>
           </div>
         ))}
-        {frameData !== undefined && <p style={{fontSize: 45, color: '#D6FFF6'}}>TOTAL: {totalDegen} $DEGEN</p>}
+        {frameData !== undefined && groupedArray.length > 0 && <p style={{fontSize: 45, color: '#D6FFF6'}}>TOTAL: {totalDegen} $DEGEN</p>}
+        {frameData !== undefined && groupedArray.length === 0 && <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+          <p style={{fontSize: 45, color: '#D6FFF6'}}>You haven't tipped today</p>
+          <p style={{fontSize: 45, color: '#D6FFF6'}}>Tip artists, musicians, devs, leaders, etc.</p>
+          </div>}
         </div>
       </div>
     ),
