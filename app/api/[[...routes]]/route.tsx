@@ -1,12 +1,12 @@
 /** @jsxImportSource @airstack/frog/jsx */
 
-import { Button, Frog } from "@airstack/frog";
-import { devtools } from "@airstack/frog/dev";
-// import { neynar } from 'frog/hubs'
-import { handle } from '@airstack/frog/next'
+import { Button, Frog } from "frog";
+import { devtools } from "frog/dev";
+import { handle } from 'frog/next'
 import { serveStatic } from '@airstack/frog/serve-static'
 import { NeynarAPIClient } from "@neynar/nodejs-sdk";
 import { isWithinTimeRange } from "../../helper";
+import { airstack } from "@airstack/frog/hubs";
 
 interface FCUser {
   username: string,
@@ -22,11 +22,10 @@ const app = new Frog<{ State: State }>({
   initialState: {
     count: 0
   },
-  apiKey: process.env.AIRSTACK_API_KEY as string,
   assetsPath: '/',
   basePath: '/api',
   hub: {
-    apiUrl: "https://hubs.airstack.xyz",
+    apiUrl: airstack({ apiKey: process.env.AIRSTACK_API_KEY as string }).apiUrl,
     fetchOptions: {
       headers: {
         "x-airstack-hubs": process.env.AIRSTACK_API_KEY || "",
@@ -55,11 +54,12 @@ app.frame('/', async (c) => {
     const castDate = new Date(cast.timestamp)
     const hours = castDate.getUTCHours()
     const minutes = castDate.getUTCMinutes()
+    const formattedTime = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
 
     return {
       author: cast.parentAuthor,
       text: cast.text,
-      timestamp: `${hours}:${minutes}`
+      timestamp: `${formattedTime}`
     }
   })
   .map((cast) => {
@@ -141,6 +141,7 @@ app.frame('/', async (c) => {
         }}
       >
         <h1 style={{fontSize: 70, color: '#D6FFF6'}}>Who did I tip today?</h1>
+        {frameData === undefined && <h4 style={{fontSize: 35, color: '#D6FFF6'}}>by @leovido</h4>} 
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           {groupedArray.length > 0 && groupedArray[state.count].map((u, index) => (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -150,7 +151,7 @@ app.frame('/', async (c) => {
           </div>
         ))}
         {frameData !== undefined && groupedArray.length > 0 && <p style={{fontSize: 45, color: '#D6FFF6'}}>TOTAL: {totalDegen} $DEGEN</p>}
-        {frameData !== undefined && <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+        {frameData !== undefined && groupedArray.length === 0 && <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
           <p style={{fontSize: 45, color: '#D6FFF6'}}>You haven't tipped today</p>
           <p style={{fontSize: 45, color: '#D6FFF6'}}>Tip artists, musicians, devs, leaders, etc.</p>
           </div>}
@@ -162,12 +163,12 @@ app.frame('/', async (c) => {
       frameData !== undefined && groupedArray.length > 5 && <Button value="dec">←</Button>,
       frameData !== undefined && groupedArray.length > 5 && <Button value="inc">→</Button>,
       frameData !== undefined && <Button.Link href="https://warpcast.com/leovido">Made by @leovido</Button.Link>,
-      frameData !== undefined && <Button.Link href="https://warpcast.com/~/compose?text=Check%20who%20you%20tipped%20today%20in%20the%20cast%20below%0A%0A&embeds[]=https://warpcast.com/leovido.eth/0x9fb993a0">Share frame</Button.Link>,
+      frameData !== undefined && <Button.Link href="https://warpcast.com/~/compose?text=Ever+wondered+who+you+tipped+today%3F%0D%0A%0D%0AYou+can+with+this+frame+now%21%0A%0A&embeds[]=https://warpcast.com/leovido.eth/0x9fb993a0">Share frame</Button.Link>,
     ],
   })
 })
 
-devtools(app, { serveStatic })
+// devtools(app, { serveStatic })
 
 export const GET = handle(app)
 export const POST = handle(app)
