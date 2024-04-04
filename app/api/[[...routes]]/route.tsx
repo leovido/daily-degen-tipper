@@ -1,4 +1,4 @@
-/** @jsxImportSource @airstack/frog/jsx */
+/** @jsxImportSource frog/jsx */
 
 import { Button, Frog } from "frog";
 import { devtools } from "frog/dev";
@@ -168,7 +168,7 @@ app.frame('/', async (c) => {
   })
 })
 
-// devtools(app, { serveStatic })
+devtools(app, { serveStatic })
 
 export const GET = handle(app)
 export const POST = handle(app)
