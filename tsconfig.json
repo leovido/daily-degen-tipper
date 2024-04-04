@@ -11,6 +11,7 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
+    "jsxImportSource": "@airstack/frog/jsx",
     "incremental": true,
     "plugins": [
       {

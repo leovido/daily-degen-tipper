@@ -1,13 +1,12 @@
-/** @jsxImportSource frog/jsx */
+/** @jsxImportSource @airstack/frog/jsx */
 
-import { Button, Frog } from 'frog'
-import { devtools } from 'frog/dev'
+import { Button, Frog } from "@airstack/frog";
+import { devtools } from "@airstack/frog/dev";
 // import { neynar } from 'frog/hubs'
-import { handle } from 'frog/next'
-import { serveStatic } from 'frog/serve-static'
+import { handle } from '@airstack/frog/next'
+import { serveStatic } from '@airstack/frog/serve-static'
 import { NeynarAPIClient } from "@neynar/nodejs-sdk";
 import { isWithinTimeRange } from "../../helper";
-import { vars } from './ui'
 
 interface FCUser {
   username: string,
@@ -23,10 +22,9 @@ const app = new Frog<{ State: State }>({
   initialState: {
     count: 0
   },
+  apiKey: process.env.AIRSTACK_API_KEY as string,
   assetsPath: '/',
   basePath: '/api',
-  ui: { vars },
-  // Supply a Hub to enable frame verification.
   hub: {
     apiUrl: "https://hubs.airstack.xyz",
     fetchOptions: {
@@ -35,7 +33,6 @@ const app = new Frog<{ State: State }>({
       }
     }
   }
-  // hub: neynar({ apiKey: 'NEYNAR_FROG_FM' })
 })
 
 // Uncomment to use Edge Runtime
@@ -152,7 +149,11 @@ app.frame('/', async (c) => {
             </p>
           </div>
         ))}
-        {frameData !== undefined && <p style={{fontSize: 45, color: '#D6FFF6'}}>TOTAL: {totalDegen} $DEGEN</p>}
+        {frameData !== undefined && groupedArray.length > 0 && <p style={{fontSize: 45, color: '#D6FFF6'}}>TOTAL: {totalDegen} $DEGEN</p>}
+        {frameData !== undefined && <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+          <p style={{fontSize: 45, color: '#D6FFF6'}}>You haven't tipped today</p>
+          <p style={{fontSize: 45, color: '#D6FFF6'}}>Tip artists, musicians, devs, leaders, etc.</p>
+          </div>}
         </div>
       </div>
     ),
@@ -161,7 +162,7 @@ app.frame('/', async (c) => {
       frameData !== undefined && groupedArray.length > 5 && <Button value="dec">←</Button>,
       frameData !== undefined && groupedArray.length > 5 && <Button value="inc">→</Button>,
       frameData !== undefined && <Button.Link href="https://warpcast.com/leovido">Made by @leovido</Button.Link>,
-      frameData !== undefined && <Button.Link href="https://warpcast.com/~/compose?text=Check%20who%20you%20tipped%20today%0A%0A&embeds[]=https://daily-degen-tipper.vercel.app/api">Share frame</Button.Link>,
+      frameData !== undefined && <Button.Link href="https://warpcast.com/~/compose?text=Check%20who%20you%20tipped%20today%20in%20the%20cast%20below%0A%0A&embeds[]=https://warpcast.com/leovido.eth/0x9fb993a0">Share frame</Button.Link>,
     ],
   })
 })
