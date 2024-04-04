@@ -26,8 +26,14 @@ const app = new Frog<{ State: State }>({
   assetsPath: '/',
   basePath: '/api',
   ui: { vars },
-  // Supply a Hub to enable frame verification.
-  // hub: neynar({ apiKey: 'NEYNAR_FROG_FM' })
+  hub: {
+    apiUrl: "https://hubs.airstack.xyz",
+    fetchOptions: {
+      headers: {
+        "x-airstack-hubs": process.env.AIRSTACK_API_KEY || "",
+      }
+    }
+  }
 })
 
 // Uncomment to use Edge Runtime
