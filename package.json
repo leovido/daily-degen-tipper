@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@neynar/nodejs-sdk": "^1.14.0",
+    "@vercel/speed-insights": "^1.0.10",
     "dotenv": "^16.4.5",
     "frog": "^0.8.0",
     "hono": "^4.2.1",
