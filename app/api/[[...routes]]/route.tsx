@@ -205,7 +205,7 @@ app.frame('/', async (c) => {
       frameData !== undefined && groupedArray.length > 5 && <Button value="dec">←</Button>,
       frameData !== undefined && groupedArray.length > 5 && <Button value="inc">→</Button>,
       frameData !== undefined && <Button.Link href="https://warpcast.com/leovido.eth">Made by @leovido.eth</Button.Link>,
-      frameData !== undefined && <Button.Link href="https://warpcast.com/~/compose?text=Check%20who%20you%20tipped%20today%0A%0AMade%20by$20@leovido.eth%0A%0A&embeds[]=https://daily-degen-tipper.vercel.app/api">Share frame</Button.Link>,
+      frameData !== undefined && <Button.Link href="https://warpcast.com/~/compose?text=Check%20who%20you%20tipped%20today%0A%0AMade%20by%20@leovido.eth%0A%0A&embeds[]=https://daily-degen-tipper.vercel.app/api">Share frame</Button.Link>,
     ],
   })
 })
