@@ -72,11 +72,12 @@ const client = new NeynarAPIClient(process.env.NEYNAR_API_KEY || "");
 app.frame('/', async (c) => {
   const { buttonIndex, frameData, deriveState } = c
 
-  const allCasts = await client.fetchAllCastsCreatedByUser(frameData?.fid || 0, {
+  const fid = frameData?.fid || 0;
+  const allCasts = await client.fetchAllCastsCreatedByUser(fid, {
     limit: 100
   })
 
-  const request = await fetch('https://www.degen.tips/api/airdrop2/tip-allowance?fid=203666')
+  const request = await fetch(`https://www.degen.tips/api/airdrop2/tip-allowance?fid={fid}`)
 
   const json: DegenResponse[] = await request.json()
   const allowance = json.find((value) => {
