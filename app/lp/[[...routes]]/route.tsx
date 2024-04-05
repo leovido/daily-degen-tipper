@@ -78,7 +78,7 @@ app.frame('/', async (c) => {
     }
   })
   .map((cast) => {
-    const pattern = /(\W*)(🍖)\s*x?\s*(\d+)/;
+    const pattern = /(🍖+)(?:\s*x\s*(\d+))?/;
 
     const match = cast.text.match(pattern)
   
