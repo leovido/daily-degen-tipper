@@ -7,9 +7,7 @@ export const {
   Heading,
   HStack,
   Rows,
-  Row
-
-,
+  Row,
   Spacer,
   Text,
   VStack,

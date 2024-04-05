@@ -144,7 +144,7 @@ app.frame('/', async (c) => {
         }}
       >
         <h1 style={{fontSize: 70, color: '#D6FFF6'}}>Who did I tip today?</h1>
-        {frameData === undefined && <h4 style={{fontSize: 35, color: '#D6FFF6'}}>by @leovido</h4>} 
+        {frameData === undefined && <h4 style={{fontSize: 35, color: '#D6FFF6'}}>by @leovido.eth</h4>} 
 
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           {groupedArray.length > 0 && groupedArray[state.count].map((u, index) => (
@@ -166,7 +166,7 @@ app.frame('/', async (c) => {
       frameData === undefined && <Button value="check">Check</Button>,
       frameData !== undefined && groupedArray.length > 5 && <Button value="dec">←</Button>,
       frameData !== undefined && groupedArray.length > 5 && <Button value="inc">→</Button>,
-      frameData !== undefined && <Button.Link href="https://warpcast.com/leovido">Made by @leovido</Button.Link>,
+      frameData !== undefined && <Button.Link href="https://warpcast.com/leovido.eth">Made by @leovido.eth</Button.Link>,
       frameData !== undefined && <Button.Link href="https://warpcast.com/~/compose?text=Check%20who%20you%20tipped%20today%0A%0A&embeds[]=https://daily-degen-tipper.vercel.app/api">Share frame</Button.Link>,
     ],
   })

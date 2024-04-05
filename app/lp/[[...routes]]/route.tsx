@@ -2,12 +2,11 @@
 
 import { Button, Frog } from 'frog'
 import { devtools } from 'frog/dev'
-// import { neynar } from 'frog/hubs'
 import { handle } from 'frog/next'
 import { serveStatic } from 'frog/serve-static'
 import { NeynarAPIClient } from "@neynar/nodejs-sdk";
-import { isWithinTimeRange, isWithinTimeRangeLP } from "../../helper";
-import { vars } from '../../api/[[...routes]]/ui'
+import { isWithinTimeRangeLP } from "../../helper";
+import { Box, Heading, VStack, vars } from '../../api/[[...routes]]/ui'
 
 interface FCUser {
   username: string,
@@ -26,6 +25,25 @@ const app = new Frog<{ State: State }>({
   assetsPath: '/',
   basePath: '/lp',
   ui: { vars },
+  imageOptions: {
+    /* Other default options */
+    fonts: [
+      {
+        name: 'Open Sans',
+        weight: 400,
+        source: 'google',
+      },
+      {
+        name: 'Open Sans',
+        weight: 700,
+        source: 'google',
+      },
+      {
+        name: 'VT323',
+        source: 'google',
+      },
+    ],
+  },
   hub: {
     apiUrl: "https://hubs.airstack.xyz",
     fetchOptions: {
@@ -39,7 +57,27 @@ const app = new Frog<{ State: State }>({
 // Uncomment to use Edge Runtime
 // export const runtime = 'edge'
 
-const client = new NeynarAPIClient(process.env.NEYNAR_API_KEY || ""); 
+const client = new NeynarAPIClient(process.env.NEYNAR_API_KEY || "");
+
+app.frame('/testing', (c) => {
+  return c.res({
+    image: (
+      <Box
+        grow
+        alignVertical="center"
+        backgroundColor="background"
+        padding="32"
+      >
+        <VStack gap="4">
+          <Heading>FrogUI 🐸</Heading>
+          <Text color="text200" size="20">
+            Build consistent frame experiences
+          </Text>
+        </VStack>
+      </Box>
+    )
+  })
+})
 
 app.frame('/', async (c) => {
   const { buttonIndex, frameData, deriveState } = c
@@ -48,6 +86,10 @@ app.frame('/', async (c) => {
     limit: 100
   })
 
+  const fetchAllowance = await fetch('https://farcaster.dep.dev/lp/tips/203666')
+
+  const {allowance} = await fetchAllowance.json()
+  
   const date = new Date()
   const fff = allCasts.result.casts.filter((cast) => {
     return isWithinTimeRangeLP(date, cast.timestamp)
@@ -132,8 +174,9 @@ app.frame('/', async (c) => {
     image: (
       <div
         style={{
+          fontFamily: "VT323",
           alignItems: 'center',
-          background: 'linear-gradient(to right, #231651, #17101F)',
+          background: 'linear-gradient(to right, #0049f7, #000000)',
           backgroundSize: '100% 100%',
           display: 'flex',
           flexDirection: 'column',
@@ -145,22 +188,23 @@ app.frame('/', async (c) => {
         }}
       >
         <h1 style={{fontSize: 70, color: '#D6FFF6'}}>Who did I tip today?</h1>
-        <h1 style={{fontSize: 50, color: '#D6FFF6'}}>LP Ham edition</h1>
-        {frameData === undefined && <h4 style={{fontSize: 35, color: '#D6FFF6'}}>by @leovido</h4>} 
+        {frameData === undefined && <h1 style={{fontSize: 50, color: '#D6FFF6'}}>LP Ham edition</h1>} 
+        {frameData === undefined && <h4 style={{fontSize: 35, color: '#D6FFF6'}}>by @leovido.eth</h4>} 
 
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           {groupedArray.length > 0 && groupedArray[state.count].map((u, index) => (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <p key={index} style={{fontFamily: "AvenirNext", fontSize: 35, color: '#D6FFF6'}}>
+            <p key={index} style={{fontSize: 35, color: '#D6FFF6'}}>
             {`${(5 * state.count) + index + 1}. @${u?.username} - ${u?.hamValue} at ${u?.timestamp} UTC`}
             </p>
           </div>
         ))}
-        {frameData !== undefined && groupedArray.length > 0 && <p style={{fontSize: 45, color: '#D6FFF6'}}>TOTAL: {totalHam} $TN100X</p>}
+        {frameData !== undefined && groupedArray.length > 0 && <p style={{fontSize: 45, color: '#D6FFF6'}}>TOTAL: {totalHam}/{Math.trunc(allowance)} $TN100X</p>}
         {frameData !== undefined && groupedArray.length === 0 && <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
-          <p style={{fontSize: 45, color: '#D6FFF6'}}>You haven't tipped today</p>
+          <p style={{fontSize: 45, color: '#D6FFF6'}}>You haven't tipped 🍖 today</p>
           <p style={{fontSize: 45, color: '#D6FFF6'}}>Tip artists, musicians, devs, leaders, etc.</p>
-          </div>}
+          </div>
+        }
         </div>
       </div>
     ),
@@ -168,7 +212,7 @@ app.frame('/', async (c) => {
       frameData === undefined && <Button value="check">Check</Button>,
       frameData !== undefined && groupedArray.length > 5 && <Button value="dec">←</Button>,
       frameData !== undefined && groupedArray.length > 5 && <Button value="inc">→</Button>,
-      frameData !== undefined && <Button.Link href="https://warpcast.com/leovido">Made by @leovido</Button.Link>,
+      frameData !== undefined && <Button.Link href="https://warpcast.com/leovido.eth">Made by @leovido.eth</Button.Link>,
       frameData !== undefined && <Button.Link href="https://warpcast.com/~/compose?text=Check%20who%20you%20tipped%20today%0A%0A&embeds[]=https://daily-degen-tipper.vercel.app/api">Share frame</Button.Link>,
     ],
   })
