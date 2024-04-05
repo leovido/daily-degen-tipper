@@ -77,12 +77,13 @@ app.frame('/', async (c) => {
     limit: 100
   })
 
-  const request = await fetch(`https://www.degen.tips/api/airdrop2/tip-allowance?fid={fid}`)
+  // const request = await fetch(`https://www.degen.tips/api/airdrop2/tip-allowance?fid={fid}`)
 
-  const json: DegenResponse[] = await request.json()
-  const allowance = json.find((value) => {
-    return value.tip_allowance
-  })?.tip_allowance || 0
+  // const json: DegenResponse[] = await request.json()
+
+  // const allowance = json.find((value) => {
+  //   return value.tip_allowance
+  // })?.tip_allowance || 0
 
   const date = new Date()
   const fff = allCasts.result.casts.filter((cast) => {
@@ -191,7 +192,7 @@ app.frame('/', async (c) => {
             </p>
           </div>
         ))}
-        {frameData !== undefined && groupedArray.length > 0 && <p style={{fontFamily: 'Open Sans', fontWeight: 700, fontSize: 45, color: '#FFD700'}}>TOTAL: {totalDegen}/{allowance} $DEGEN</p>}
+        {frameData !== undefined && groupedArray.length > 0 && <p style={{fontFamily: 'Open Sans', fontWeight: 700, fontSize: 45, color: '#FFD700'}}>TOTAL: {totalDegen} $DEGEN</p>}
         {frameData !== undefined && groupedArray.length === 0 && <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
           <p style={{fontSize: 45, color: '#D6FFF6'}}>You haven't tipped today</p>
           <p style={{fontSize: 45, color: '#D6FFF6'}}>Tip artists, musicians, devs, leaders, etc.</p>
