@@ -15,6 +15,16 @@ interface FCUser {
   timestamp: string
 }
 
+interface DegenResponse {
+  snapshot_date: string,
+  user_rank: string,
+  wallet_address: string,
+  avatar_url: string,
+  display_name: string,
+  tip_allowance: string,
+  remaining_allowance: string
+}
+
 type State = {
   count: number
 }
@@ -26,6 +36,24 @@ const app = new Frog<{ State: State }>({
   assetsPath: '/',
   basePath: '/api',
   ui: { vars },
+  imageOptions: {
+    fonts: [
+      {
+        name: 'Open Sans',
+        source: 'google',
+        weight: 700
+      },
+      {
+        name: 'Open Sans',
+        source: 'google',
+        weight: 400
+      },
+      {
+        name: 'DM Serif Display',
+        source: 'google',
+      },
+    ],
+  },
   hub: {
     apiUrl: "https://hubs.airstack.xyz",
     fetchOptions: {
@@ -47,6 +75,13 @@ app.frame('/', async (c) => {
   const allCasts = await client.fetchAllCastsCreatedByUser(frameData?.fid || 0, {
     limit: 100
   })
+
+  const request = await fetch('https://www.degen.tips/api/airdrop2/tip-allowance?fid=203666')
+
+  const json: DegenResponse[] = await request.json()
+  const allowance = json.find((value) => {
+    return value.tip_allowance
+  })?.tip_allowance || 0
 
   const date = new Date()
   const fff = allCasts.result.casts.filter((cast) => {
@@ -131,6 +166,7 @@ app.frame('/', async (c) => {
     image: (
       <div
         style={{
+          fontFamily: 'Open Sans',
           alignItems: 'center',
           background: 'linear-gradient(to right, #231651, #17101F)',
           backgroundSize: '100% 100%',
@@ -143,7 +179,7 @@ app.frame('/', async (c) => {
           width: '100%',
         }}
       >
-        <h1 style={{fontSize: 70, color: '#D6FFF6'}}>Who did I tip today?</h1>
+        <h1 style={{fontFamily: 'DM Serif Display', fontSize: 70, color: '#D6FFF6'}}>Who did I tip today?</h1>
         {frameData === undefined && <h4 style={{fontSize: 35, color: '#D6FFF6'}}>by @leovido.eth</h4>} 
 
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -154,7 +190,7 @@ app.frame('/', async (c) => {
             </p>
           </div>
         ))}
-        {frameData !== undefined && groupedArray.length > 0 && <p style={{fontSize: 45, color: '#D6FFF6'}}>TOTAL: {totalDegen} $DEGEN</p>}
+        {frameData !== undefined && groupedArray.length > 0 && <p style={{fontFamily: 'Open Sans', fontWeight: 700, fontSize: 45, color: '#FFD700'}}>TOTAL: {totalDegen}/{allowance} $DEGEN</p>}
         {frameData !== undefined && groupedArray.length === 0 && <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
           <p style={{fontSize: 45, color: '#D6FFF6'}}>You haven't tipped today</p>
           <p style={{fontSize: 45, color: '#D6FFF6'}}>Tip artists, musicians, devs, leaders, etc.</p>
