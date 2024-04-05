@@ -6,7 +6,7 @@ import { handle } from 'frog/next'
 import { serveStatic } from 'frog/serve-static'
 import { NeynarAPIClient } from "@neynar/nodejs-sdk";
 import { isWithinTimeRangeLP } from "../../helper";
-import { Box, Heading, VStack, vars } from '../../api/[[...routes]]/ui'
+import { vars } from '../../api/[[...routes]]/ui'
 
 interface FCUser {
   username: string,
@@ -26,18 +26,7 @@ const app = new Frog<{ State: State }>({
   basePath: '/lp',
   ui: { vars },
   imageOptions: {
-    /* Other default options */
     fonts: [
-      {
-        name: 'Open Sans',
-        weight: 400,
-        source: 'google',
-      },
-      {
-        name: 'Open Sans',
-        weight: 700,
-        source: 'google',
-      },
       {
         name: 'VT323',
         source: 'google',
@@ -59,34 +48,15 @@ const app = new Frog<{ State: State }>({
 
 const client = new NeynarAPIClient(process.env.NEYNAR_API_KEY || "");
 
-app.frame('/testing', (c) => {
-  return c.res({
-    image: (
-      <Box
-        grow
-        alignVertical="center"
-        backgroundColor="background"
-        padding="32"
-      >
-        <VStack gap="4">
-          <Heading>FrogUI 🐸</Heading>
-          <Text color="text200" size="20">
-            Build consistent frame experiences
-          </Text>
-        </VStack>
-      </Box>
-    )
-  })
-})
-
 app.frame('/', async (c) => {
   const { buttonIndex, frameData, deriveState } = c
 
-  const allCasts = await client.fetchAllCastsCreatedByUser(frameData?.fid || 0, {
+  const fid = frameData?.fid || 0
+  const allCasts = await client.fetchAllCastsCreatedByUser(fid, {
     limit: 100
   })
 
-  const fetchAllowance = await fetch('https://farcaster.dep.dev/lp/tips/203666')
+  const fetchAllowance = await fetch(`https://farcaster.dep.dev/lp/tips/${fid}`)
 
   const {allowance} = await fetchAllowance.json()
   
