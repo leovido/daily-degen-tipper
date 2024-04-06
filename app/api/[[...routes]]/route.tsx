@@ -249,13 +249,15 @@ app.frame('/check', async (c) => {
           </div>
         ))}
         {frameData !== undefined && groupedArray.length > 0 && 
-          <p style={{fontFamily: 'Open Sans', fontWeight: 700, fontSize: 45, color: '#3dd68c'}}>TOTAL: {totalDegen}/{allowance} $DEGEN</p>}
+          <p style={{fontFamily: 'Open Sans', fontWeight: 700, fontSize: 45, color: '#3dd68c'}}>TOTAL: {totalDegen}/{allowance} $DEGEN</p>
+        }
         {frameData !== undefined && groupedArray.length === 0 && 
           <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
             <p style={{fontSize: 45, color: '#D6FFF6'}}>You haven't tipped today</p>
             <p style={{fontSize: 45, color: '#D6FFF6'}}>Tip artists, musicians, devs, leaders, etc.</p>
             <p style={{fontSize: 45, color: '#3dd68c', fontWeight: 700}}>Your allowance: {allowance} $DEGEN</p>
-          </div>}
+          </div>
+        }
         </div>
       </div>
     ),

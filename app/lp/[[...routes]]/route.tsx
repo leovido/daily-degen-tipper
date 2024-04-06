@@ -7,6 +7,7 @@ import { serveStatic } from 'frog/serve-static'
 import { NeynarAPIClient } from "@neynar/nodejs-sdk";
 import { isWithinTimeRangeLP } from "../../helper";
 import { vars } from '../../api/[[...routes]]/ui'
+import { mockHamItems } from './mockUsers';
 
 interface FCUser {
   username: string,
@@ -31,6 +32,10 @@ const app = new Frog<{ State: State }>({
         name: 'VT323',
         source: 'google',
       },
+      {
+        name: 'Open Sans',
+        source: 'google',
+      },
     ],
   },
   hub: {
@@ -48,8 +53,8 @@ const app = new Frog<{ State: State }>({
 
 const client = new NeynarAPIClient(process.env.NEYNAR_API_KEY || "");
 
-app.frame('/', async (c) => {
-  const { buttonIndex, frameData, deriveState } = c
+app.frame('/check', async (c) => {
+  const { buttonIndex, buttonValue, frameData, deriveState } = c
 
   const fid = frameData?.fid || 0
   const allCasts = await client.fetchAllCastsCreatedByUser(fid, {
@@ -78,11 +83,22 @@ app.frame('/', async (c) => {
     }
   })
   .map((cast) => {
-    const pattern = /(\W*)(🍖)\s*x?\s*(\d+)/;
+    const pattern = /(🍖+)(?:\s*x\s*(\d+))?/;;
 
     const match = cast.text.match(pattern)
   
     if (match !== null) {
+      if (match[0]) {
+        Array(match[0]).reduce((acc, item) => {
+          if (item === "🍖") {
+            return acc + 10
+          } else {
+            return acc
+          }
+        })
+        const hamValue = match[1] * 10
+
+      }
       return {
         hamValue: match[0] || '',
         author: cast.author.fid || '',
@@ -125,6 +141,7 @@ app.frame('/', async (c) => {
     if (item) {
       const amount = (item.hamValue?.match(/\d+/) ?? [0])[0] ?? 0;
 
+      // Multiply times 10 per 🍖
       return acc + Number(amount) * 10
     } else {
       return acc + 0
@@ -136,8 +153,8 @@ app.frame('/', async (c) => {
   );
 
   const state = deriveState(previousState => {
-    if (buttonIndex === 3) previousState.count++
-    if (buttonIndex === 2) previousState.count - 1
+    if (buttonIndex === 2 && buttonValue !== "check") previousState.count++
+    if (buttonIndex === 1 && buttonValue !== "check") previousState.count--
   })
 
   return c.res({
@@ -146,7 +163,7 @@ app.frame('/', async (c) => {
         style={{
           fontFamily: "VT323",
           alignItems: 'center',
-          background: 'linear-gradient(to right, #0049f7, #000000)',
+          background: 'linear-gradient(to right, #000000, #0049f7)',
           backgroundSize: '100% 100%',
           display: 'flex',
           flexDirection: 'column',
@@ -157,33 +174,63 @@ app.frame('/', async (c) => {
           width: '100%',
         }}
       >
-        <h1 style={{fontSize: 70, color: '#D6FFF6'}}>Who did I tip today?</h1>
-        {frameData === undefined && <h1 style={{fontSize: 50, color: '#D6FFF6'}}>LP Ham edition</h1>} 
-        {frameData === undefined && <h4 style={{fontSize: 35, color: '#D6FFF6'}}>by @leovido.eth</h4>} 
+        <h1 style={{fontSize: 85, color: '#D6FFF6'}}>Who did I tip today?</h1>
 
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           {groupedArray.length > 0 && groupedArray[state.count].map((u, index) => (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <p key={index} style={{fontSize: 35, color: '#D6FFF6'}}>
-            {`${(5 * state.count) + index + 1}. @${u?.username} - ${u?.hamValue} at ${u?.timestamp} UTC`}
+            <p key={index} style={{fontFamily: 'Open Sans', fontSize: 35, color: '#D6FFF6'}}>
+              {`${(5 * state.count) + index + 1}. @${u?.username} - ${u?.hamValue} at ${u?.timestamp} UTC`}
             </p>
           </div>
         ))}
-        {frameData !== undefined && groupedArray.length > 0 && <p style={{fontSize: 45, color: '#D6FFF6'}}>TOTAL: {totalHam}/{Math.trunc(allowance)} $TN100X</p>}
-        {frameData !== undefined && groupedArray.length === 0 && <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+        {groupedArray.length > 0 && 
+          <p style={{fontSize: 45, color: '#3dd68c'}}>TOTAL: {totalHam}/{Math.trunc(allowance)} $TN100X</p>
+        }
+        {groupedArray.length === 0 && 
+        <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
           <p style={{fontSize: 45, color: '#D6FFF6'}}>You haven't tipped 🍖 today</p>
           <p style={{fontSize: 45, color: '#D6FFF6'}}>Tip artists, musicians, devs, leaders, etc.</p>
+          <p style={{fontSize: 45, color: '#3dd68c', fontWeight: 700}}>Your allowance: {Math.trunc(allowance)} 🍖</p>
           </div>
         }
         </div>
       </div>
     ),
     intents: [
-      frameData === undefined && <Button value="check">Check</Button>,
-      frameData !== undefined && groupedArray.length > 5 && <Button value="dec">←</Button>,
-      frameData !== undefined && groupedArray.length > 5 && <Button value="inc">→</Button>,
-      frameData !== undefined && <Button.Link href="https://warpcast.com/leovido.eth">Made by @leovido.eth</Button.Link>,
-      frameData !== undefined && <Button.Link href="https://warpcast.com/~/compose?text=Check%20who%20you%20tipped%20today%0A%0AMade%20by$20@leovido.eth%0A%0A&embeds[]=https://daily-degen-tipper.vercel.app/lp">Share frame</Button.Link>,
+      frameData !== undefined && groupedArray.length > 1 && <Button value="dec">←</Button>,
+      frameData !== undefined && groupedArray.length > 1 && <Button value="inc">→</Button>,
+      frameData !== undefined && <Button.Link href="https://warpcast.com/leovido.eth/0xbacc2874">Tip @leovido.eth</Button.Link>,
+      frameData !== undefined && <Button.Link href="https://warpcast.com/~/compose?text=Check%20who%20you%20tipped%20today%0A%0AMade%20by%20@leovido.eth%0A%0A&embeds[]=https://daily-degen-tipper.vercel.app/lp">Share frame</Button.Link>,
+    ],
+  })
+})
+
+app.frame('/', async (c) => {
+  return c.res({
+    image: (
+      <div
+        style={{
+          fontFamily: "VT323",
+          alignItems: 'center',
+          background: 'linear-gradient(to right, #000000, #0049f7)',
+          backgroundSize: '100% 100%',
+          display: 'flex',
+          flexDirection: 'column',
+          flexWrap: 'nowrap',
+          height: '100%',
+          justifyContent: 'center',
+          textAlign: 'center',
+          width: '100%',
+        }}
+      >
+        <h1 style={{fontSize: 85, color: '#D6FFF6'}}>Who did I tip today?</h1>
+        <h1 style={{fontSize: 55, color: '#D6FFF6'}}>🍖 LP Ham edition 🍖</h1>
+        <h4 style={{fontFamily: 'Open Sans', fontSize: 35, color: '#D6FFF6'}}>by @leovido.eth</h4>
+      </div>
+    ),
+    intents: [
+      <Button action="/check" value="check">Check</Button>,
     ],
   })
 })
