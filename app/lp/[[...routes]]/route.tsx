@@ -83,22 +83,11 @@ app.frame('/check', async (c) => {
     }
   })
   .map((cast) => {
-    const pattern = /(🍖+)(?:\s*x\s*(\d+))?/;;
+    const pattern = /(\W*)(🍖)\s*x?\s*(\d+)/;
 
     const match = cast.text.match(pattern)
   
     if (match !== null) {
-      if (match[0]) {
-        Array(match[0]).reduce((acc, item) => {
-          if (item === "🍖") {
-            return acc + 10
-          } else {
-            return acc
-          }
-        })
-        const hamValue = match[1] * 10
-
-      }
       return {
         hamValue: match[0] || '',
         author: cast.author.fid || '',
@@ -141,7 +130,6 @@ app.frame('/check', async (c) => {
     if (item) {
       const amount = (item.hamValue?.match(/\d+/) ?? [0])[0] ?? 0;
 
-      // Multiply times 10 per 🍖
       return acc + Number(amount) * 10
     } else {
       return acc + 0
