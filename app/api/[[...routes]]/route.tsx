@@ -8,6 +8,7 @@ import { serveStatic } from 'frog/serve-static'
 import { NeynarAPIClient } from "@neynar/nodejs-sdk";
 import { isWithinTimeRange } from "../../helper";
 import { vars } from './ui'
+import { mockItems } from './mockFCUser';
 
 interface FCUser {
   username: string,
@@ -70,20 +71,76 @@ const app = new Frog<{ State: State }>({
 const client = new NeynarAPIClient(process.env.NEYNAR_API_KEY || ""); 
 
 app.frame('/', async (c) => {
-  const { buttonIndex, frameData, deriveState } = c
+  return c.res({
+    image: (
+      <div
+        style={{
+          fontFamily: 'Open Sans',
+          alignItems: 'center',
+          background: 'linear-gradient(to right, #231651, #17101F)',
+          backgroundSize: '100% 100%',
+          display: 'flex',
+          flexDirection: 'column',
+          flexWrap: 'nowrap',
+          height: '100%',
+          justifyContent: 'center',
+          textAlign: 'center',
+          width: '100%',
+        }}
+      >
+        <h1 style={{fontFamily: 'DM Serif Display', fontSize: 70, color: '#D6FFF6'}}>Who did I tip today?</h1>
+        <h4 style={{fontSize: 35, color: '#D6FFF6'}}>by @leovido.eth</h4>
+      </div>
+    ),
+    intents: [
+      <Button action="/check" value="check">Check</Button>,
+    ],
+  })
+})
+
+app.frame('/check', async (c) => {
+  const { buttonValue, buttonIndex, frameData, deriveState, verified } = c
+
+  if (!verified) {
+    console.log(`Frame verification failed for ${frameData?.fid}`)
+    return c.res({
+      image: (
+        <div
+        style={{
+          fontFamily: 'Open Sans',
+          alignItems: 'center',
+          background: 'linear-gradient(to right, #231651, #17101F)',
+          backgroundSize: '100% 100%',
+          display: 'flex',
+          flexDirection: 'column',
+          flexWrap: 'nowrap',
+          height: '100%',
+          justifyContent: 'center',
+          textAlign: 'center',
+          width: '100%',
+        }}
+      >
+        <p style={{fontFamily: 'Open Sans', fontWeight: 700, fontSize: 45, color: '#D6FFF6'}}>Something went wrong</p>
+      </div>
+      ),
+      intents: [
+        <Button action="/">Restart</Button>,
+      ],
+    })
+  }
 
   const fid = frameData?.fid || 0;
   const allCasts = await client.fetchAllCastsCreatedByUser(fid, {
     limit: 100
   })
 
-  // const request = await fetch(`https://www.degen.tips/api/airdrop2/tip-allowance?fid={fid}`)
+  const request = await fetch(`https://www.degen.tips/api/airdrop2/tip-allowance?fid=${fid}`)
 
-  // const json: DegenResponse[] = await request.json()
+  const json: DegenResponse[] = await request.json()
 
-  // const allowance = json.find((value) => {
-  //   return value.tip_allowance
-  // })?.tip_allowance || 0
+  const allowance = json.find((value) => {
+    return value.tip_allowance
+  })?.tip_allowance || 0
 
   const date = new Date()
   const fff = allCasts.result.casts.filter((cast) => {
@@ -160,8 +217,8 @@ app.frame('/', async (c) => {
   );
 
   const state = deriveState(previousState => {
-    if (buttonIndex === 3) previousState.count++
-    if (buttonIndex === 2) previousState.count - 1
+    if (buttonIndex === 2 && buttonValue !== "check") previousState.count++
+    if (buttonIndex === 1 && buttonValue !== "check") previousState.count--
   })
 
   return c.res({
@@ -182,7 +239,6 @@ app.frame('/', async (c) => {
         }}
       >
         <h1 style={{fontFamily: 'DM Serif Display', fontSize: 70, color: '#D6FFF6'}}>Who did I tip today?</h1>
-        {frameData === undefined && <h4 style={{fontSize: 35, color: '#D6FFF6'}}>by @leovido.eth</h4>} 
 
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           {groupedArray.length > 0 && groupedArray[state.count].map((u, index) => (
@@ -192,24 +248,26 @@ app.frame('/', async (c) => {
             </p>
           </div>
         ))}
-        {frameData !== undefined && groupedArray.length > 0 && <p style={{fontFamily: 'Open Sans', fontWeight: 700, fontSize: 45, color: '#FFD700'}}>TOTAL: {totalDegen} $DEGEN</p>}
-        {frameData !== undefined && groupedArray.length === 0 && <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
-          <p style={{fontSize: 45, color: '#D6FFF6'}}>You haven't tipped today</p>
-          <p style={{fontSize: 45, color: '#D6FFF6'}}>Tip artists, musicians, devs, leaders, etc.</p>
+        {frameData !== undefined && groupedArray.length > 0 && 
+          <p style={{fontFamily: 'Open Sans', fontWeight: 700, fontSize: 45, color: totalDegen > Number(allowance) ? '#3dd68c' : 'red'}}>TOTAL: {totalDegen}/{allowance} $DEGEN</p>}
+        {frameData !== undefined && groupedArray.length === 0 && 
+          <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+            <p style={{fontSize: 45, color: '#D6FFF6'}}>You haven't tipped today</p>
+            <p style={{fontSize: 45, color: '#D6FFF6'}}>Tip artists, musicians, devs, leaders, etc.</p>
+            <p style={{fontSize: 45, color: '#3dd68c', fontWeight: 700}}>Your allowance: {allowance} $DEGEN</p>
           </div>}
         </div>
       </div>
     ),
     intents: [
-      frameData === undefined && <Button value="check">Check</Button>,
-      frameData === undefined && <Button.Link href="https://warpcast.com/leovido.eth/0x9fb993a0">Tip creator</Button.Link>,
-      frameData !== undefined && groupedArray.length > 5 && <Button value="dec">←</Button>,
-      frameData !== undefined && groupedArray.length > 5 && <Button value="inc">→</Button>,
-      frameData !== undefined && <Button.Link href="https://warpcast.com/leovido.eth">Made by @leovido.eth</Button.Link>,
+      frameData !== undefined && groupedArray.length > 1 && <Button value="dec">←</Button>,
+      frameData !== undefined && groupedArray.length > 1 && <Button value="inc">→</Button>,
+      frameData !== undefined && <Button.Link href="https://warpcast.com/leovido.eth/0x9fb993a0">Tip @leovido.eth</Button.Link>,
       frameData !== undefined && <Button.Link href="https://warpcast.com/~/compose?text=Check%20who%20you%20tipped%20today%0A%0AMade%20by%20@leovido.eth%0A%0A&embeds[]=https://daily-degen-tipper.vercel.app/api">Share frame</Button.Link>,
     ],
   })
 })
+
 
 devtools(app, { serveStatic })
 
