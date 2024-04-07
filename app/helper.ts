@@ -3,27 +3,29 @@ export const isWithinTimeRange = (today: Date = new Date(), timestamp: string) =
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1); 
 
-    if (today.getUTCHours() >= 0 && today.getUTCHours() < 8) {
+    const deadlineToday = (today.getUTCHours() <= 7) && (today.getUTCMinutes() < 35);
+
+    if (today.getUTCHours() >= 0 && deadlineToday) {
       const yesterday = new Date(today)
       yesterday.setDate(yesterday.getDate() - 1)
-      yesterday.setUTCHours(8, 0, 0, 0);
+      yesterday.setUTCHours(7, 35, 0, 0);
 
       const todayEnd = new Date(tomorrow);
-      todayEnd.setUTCHours(7, 59, 59, 999);
+      todayEnd.setUTCHours(7, 34, 59, 999);
  
       return date >= yesterday && date <= todayEnd
     } else {
       const todayStart = new Date(today);
-      todayStart.setUTCHours(8, 0, 0, 0);
+      todayStart.setUTCHours(7, 35, 0, 0);
 
       const todayEnd = new Date(tomorrow);
-      todayEnd.setUTCHours(7, 59, 59, 999);
+      todayEnd.setUTCHours(7, 34, 59, 999);
 
       const isTodayInRange = date >= todayStart && date <= todayEnd;
       const nextDayStart = new Date(tomorrow);
       nextDayStart.setUTCHours(0, 0, 0, 0);
       const nextDayEnd = new Date(tomorrow);
-      nextDayEnd.setUTCHours(7, 59, 59, 999);
+      nextDayEnd.setUTCHours(7, 34, 59, 999);
       const isNextDayInRange = date >= nextDayStart && date <= nextDayEnd;
 
       return isTodayInRange || isNextDayInRange;    
@@ -34,8 +36,10 @@ export const isWithinTimeRangeLP = (today: Date = new Date(), timestamp: string)
     const date = new Date(timestamp);
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1); 
+     
+    const deadlineToday = (today.getUTCHours() <= 4) && (today.getUTCMinutes() < 29);
 
-    if (today.getUTCHours() >= 0 && today.getUTCHours() < 9) {
+    if (today.getUTCHours() >= 0 && deadlineToday) {
       const yesterday = new Date(today)
       yesterday.setDate(yesterday.getDate() - 1)
       yesterday.setUTCHours(4, 30, 0, 0);
