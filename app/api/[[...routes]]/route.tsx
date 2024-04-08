@@ -130,19 +130,45 @@ app.frame('/check', async (c) => {
   }
 
   const fid = frameData?.fid || 0;
-  const allCasts = await client.fetchAllCastsCreatedByUser(fid, {
-    limit: 100
-  })
 
   const request = await fetch(`https://www.degen.tips/api/airdrop2/tip-allowance?fid=${fid}`)
 
   const json: DegenResponse[] = await request.json()
+
+  if (json.length === 0) {
+    return c.res({
+      image: (
+        <div
+        style={{
+          fontFamily: 'Open Sans',
+          alignItems: 'center',
+          background: 'linear-gradient(to right, #231651, #17101F)',
+          backgroundSize: '100% 100%',
+          display: 'flex',
+          flexDirection: 'column',
+          flexWrap: 'nowrap',
+          height: '100%',
+          justifyContent: 'center',
+          textAlign: 'center',
+          width: '100%',
+        }}
+      >
+        <h1 style={{fontFamily: 'DM Serif Display', fontSize: 70, color: '#D6FFF6'}}>Sorry, your FID: {fid} is not eligible for S3 DEGEN tipping</h1> 
+        <p style={{fontSize: 45, color: '#D6FFF6'}}>Visit https://degen.tips for more info</p>        
+      </div>
+      )
+    })
+  }
 
   const allowance = json.find((value) => {
     return value.tip_allowance
   })?.tip_allowance || 0
 
   const date = new Date()
+  
+  const allCasts = await client.fetchAllCastsCreatedByUser(fid, {
+    limit: 100
+  })
   const fff = allCasts.result.casts.filter((cast) => {
     return isWithinTimeRange(date, cast.timestamp)
   })
