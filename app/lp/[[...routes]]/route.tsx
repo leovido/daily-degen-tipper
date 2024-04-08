@@ -64,6 +64,34 @@ app.frame('/check', async (c) => {
   const fetchAllowance = await fetch(`https://farcaster.dep.dev/lp/tips/${fid}`)
 
   const {allowance} = await fetchAllowance.json()
+
+  if (allowance === 0) {
+    return c.res({
+      image: (
+        <div
+        style={{
+          fontFamily: "VT323",
+          alignItems: 'center',
+          background: 'linear-gradient(to right, #000000, #0049f7)',
+          backgroundSize: '100% 100%',
+          display: 'flex',
+          flexDirection: 'column',
+          flexWrap: 'nowrap',
+          height: '100%',
+          justifyContent: 'center',
+          textAlign: 'center',
+          width: '100%',
+        }}
+      >
+        <h1 style={{fontFamily: 'DM Serif Display', fontSize: 70, color: '#D6FFF6'}}>Sorry, your FID: {fid} is not eligible for ham tipping</h1> 
+        <p style={{fontSize: 45, color: '#D6FFF6'}}>Visit https://based.thelp.xyz for more info</p>        
+      </div>
+      ),
+      intents: [
+        <Button.Link href="https://based.thelp.xyz">Visit website</Button.Link>
+      ]
+    })
+  }
   
   const date = new Date()
   const fff = allCasts.result.casts.filter((cast) => {
