@@ -54,12 +54,37 @@ const app = new Frog<{ State: State }>({
 const client = new NeynarAPIClient(process.env.NEYNAR_API_KEY || "");
 
 app.frame('/check', async (c) => {
-  const { buttonIndex, buttonValue, frameData, deriveState } = c
+  const { buttonIndex, buttonValue, frameData, deriveState, verified } = c
 
   const fid = frameData?.fid || 0
-  const allCasts = await client.fetchAllCastsCreatedByUser(fid, {
-    limit: 100
-  })
+
+  if (!verified) {
+    console.log(`Frame verification failed for ${frameData?.fid}`)
+    return c.res({
+      image: (
+        <div
+        style={{
+          fontFamily: 'Open Sans',
+          alignItems: 'center',
+          background: 'linear-gradient(to right, #231651, #17101F)',
+          backgroundSize: '100% 100%',
+          display: 'flex',
+          flexDirection: 'column',
+          flexWrap: 'nowrap',
+          height: '100%',
+          justifyContent: 'center',
+          textAlign: 'center',
+          width: '100%',
+        }}
+      >
+        <p style={{fontFamily: 'Open Sans', fontWeight: 700, fontSize: 45, color: '#D6FFF6'}}>Something went wrong</p>
+      </div>
+      ),
+      intents: [
+        <Button action="/">Restart</Button>,
+      ],
+    })
+  }
 
   const fetchAllowance = await fetch(`https://farcaster.dep.dev/lp/tips/${fid}`)
 
@@ -94,6 +119,9 @@ app.frame('/check', async (c) => {
   }
   
   const date = new Date()
+  const allCasts = await client.fetchAllCastsCreatedByUser(fid, {
+    limit: 100
+  })
   const fff = allCasts.result.casts.filter((cast) => {
     return isWithinTimeRangeLP(date, cast.timestamp)
   })
