@@ -39,7 +39,7 @@ export const isWithinTimeRangeLP = (today: Date = new Date(), timestamp: string)
      
     const deadlineToday = (today.getUTCHours() <= 4) && (today.getUTCMinutes() < 29);
 
-    if (today.getUTCHours() >= 0 && deadlineToday) {
+    if (today.getUTCHours() >= 0 && today.getUTCHours() <= 4) {
       const yesterday = new Date(today)
       yesterday.setDate(yesterday.getDate() - 1)
       yesterday.setUTCHours(4, 30, 0, 0);
