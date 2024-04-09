@@ -5,7 +5,7 @@ export const isWithinTimeRange = (today: Date = new Date(), timestamp: string) =
 
     const deadlineToday = (today.getUTCHours() <= 7) && (today.getUTCMinutes() < 35);
 
-    if (today.getUTCHours() >= 0 && deadlineToday) {
+    if (today.getUTCHours() >= 0 && today.getUTCHours() <= 8) {
       const yesterday = new Date(today)
       yesterday.setDate(yesterday.getDate() - 1)
       yesterday.setUTCHours(7, 35, 0, 0);
