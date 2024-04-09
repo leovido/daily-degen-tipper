@@ -4,16 +4,8 @@ import { Button, Frog } from 'frog'
 import { devtools } from 'frog/dev'
 import { handle } from 'frog/next'
 import { serveStatic } from 'frog/serve-static'
-import { NeynarAPIClient } from "@neynar/nodejs-sdk";
-import { isWithinTimeRangeLP } from "../../helper";
 import { vars } from '../../api/[[...routes]]/ui'
-import { mockHamItems } from './mockUsers';
-
-interface FCUser {
-  username: string,
-  hamValue?: string,
-  timestamp: string
-}
+import { client } from './neynarClient'
 
 type State = {
   count: number
@@ -50,8 +42,6 @@ const app = new Frog<{ State: State }>({
 
 // Uncomment to use Edge Runtime
 // export const runtime = 'edge'
-
-const client = new NeynarAPIClient(process.env.NEYNAR_API_KEY || "");
 
 app.frame('/check', async (c) => {
   const { buttonIndex, buttonValue, frameData, deriveState, verified } = c
@@ -119,69 +109,8 @@ app.frame('/check', async (c) => {
   }
   
   const date = new Date()
-  const allCasts = await client.fetchAllCastsCreatedByUser(fid, {
-    limit: 100
-  })
-  const fff = allCasts.result.casts.filter((cast) => {
-    return isWithinTimeRangeLP(date, cast.timestamp)
-  })
-  .map((cast) => {
-    const castDate = new Date(cast.timestamp)
-    const hours = castDate.getUTCHours()
-    const minutes = castDate.getUTCMinutes()
 
-    const formattedTime = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
-
-    return {
-      author: cast.parentAuthor,
-      text: cast.text,
-      timestamp: `${formattedTime}`
-    }
-  })
-  .map((cast) => {
-    const pattern = /(\W*)(🍖)\s*x?\s*(\d+)/;
-
-    const match = cast.text.match(pattern)
-  
-    if (match !== null) {
-      return {
-        hamValue: match[0] || '',
-        author: cast.author.fid || '',
-        timestamp: cast.timestamp
-      }
-    }
-  })
-  .filter((value) => {
-    return value !== undefined
-  })
-  .map(async (value) => {
-    if (value) {
-      const response = await client.fetchBulkUsers([Number(value.author)])
-
-      const user = response.users.find((user) => {
-        return user.username
-      })
-
-      const val: FCUser = {
-        username: user?.username || '',
-        hamValue: value?.hamValue,
-        timestamp: value?.timestamp
-      }
-
-      return val
-    }
-  })
-  .map(async (user) => {
-    const u: FCUser | undefined = await user
-    
-    return u
-  })
-
-  const requestUser = await Promise.all(
-    fff
-  )
-
-  const items = await requestUser
+  const items = await client(fid, date)
   const totalHam = items.reduce((acc, item) => {
     if (item) {
       const amount = (item.hamValue?.match(/\d+/) ?? [0])[0] ?? 0;
@@ -244,7 +173,8 @@ app.frame('/check', async (c) => {
     intents: [
       frameData !== undefined && groupedArray.length > 1 && <Button value="dec">←</Button>,
       frameData !== undefined && groupedArray.length > 1 && <Button value="inc">→</Button>,
-      frameData !== undefined && <Button.Link href="https://warpcast.com/leovido.eth/0xbacc2874">Tip @leovido.eth</Button.Link>
+      frameData !== undefined && <Button.Link href="https://warpcast.com/leovido.eth/0xbacc2874">Tip @leovido.eth</Button.Link>,
+      frameData !== undefined && <Button.Link href="https://ham.fun">Visit ham.fun</Button.Link>,
     ],
   })
 })
