@@ -229,7 +229,7 @@ app.frame('/check', async (c) => {
           </div>
         ))}
         {groupedArray.length > 0 && 
-          <p style={{fontSize: 45, color: '#3dd68c'}}>TOTAL: {totalHam}/{Math.trunc(allowance)} $TN100X</p>
+          <p style={{fontSize: 45, color: '#3dd68c'}}>TOTAL: {totalHam}/{Math.trunc(allowance)} 🍖</p>
         }
         {groupedArray.length === 0 && 
         <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
