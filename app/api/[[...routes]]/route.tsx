@@ -281,7 +281,6 @@ app.frame('/check', async (c) => {
           <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
             <p style={{fontSize: 45, color: '#D6FFF6'}}>You haven't tipped today</p>
             <p style={{fontSize: 45, color: '#D6FFF6'}}>Tip artists, musicians, devs, leaders, etc.</p>
-            <p style={{fontSize: 45, color: '#3dd68c', fontWeight: 700}}>Your allowance: {allowance} $DEGEN</p>
           </div>
         }
         </div>
@@ -289,8 +288,7 @@ app.frame('/check', async (c) => {
     ),
     intents: [
       frameData !== undefined && groupedArray.length > 1 && <Button value="dec">←</Button>,
-      frameData !== undefined && groupedArray.length > 1 && <Button value="inc">→</Button>,
-      frameData !== undefined && <Button.Link href="https://warpcast.com/leovido.eth/0x9fb993a0">Tip @leovido.eth</Button.Link>
+      frameData !== undefined && groupedArray.length > 1 && <Button value="inc">→</Button>
     ],
   })
 })
