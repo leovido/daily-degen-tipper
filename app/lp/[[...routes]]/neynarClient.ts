@@ -38,7 +38,9 @@ const castWithMatchedHam = (cast: CastWithTimestamp) => {
 }
 
 export const client = async (fid: number, date: Date) => {
-  const fetchAllCastsResult = await neynarClient.fetchAllCastsCreatedByUser(fid);
+  const fetchAllCastsResult = await neynarClient.fetchAllCastsCreatedByUser(fid, {
+    limit: 100
+  });
   const filteredAndFormattedCasts = fetchAllCastsResult.result.casts
     .filter(cast => isWithinTimeRangeLP(date, cast.timestamp))
     .map(cast => {
