@@ -76,7 +76,14 @@ app.frame('/check', async (c) => {
     })
   }
 
-  const fetchAllowance = await fetch(`https://farcaster.dep.dev/lp/tips/${fid}`)
+  const fetchAllowance = await fetch(`https://farcaster.dep.dev/lp/tips/${fid}`,
+  {
+    headers: {
+      'Content-Type': 'application/json',
+      'Content-Encoding': 'gzip'
+    },
+  }
+  )
 
   const {allowance} = await fetchAllowance.json()
 

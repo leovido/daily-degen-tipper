@@ -131,7 +131,14 @@ app.frame('/check', async (c) => {
 
   const fid = frameData?.fid || 0;
 
-  const request = await fetch(`https://www.degen.tips/api/airdrop2/tip-allowance?fid=${fid}`)
+  const request = await fetch(`https://www.degen.tips/api/airdrop2/tip-allowance?fid=${fid}`,
+    {
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Encoding': 'gzip'
+      },
+    }
+  )
 
   const json: DegenResponse[] = await request.json()
 
