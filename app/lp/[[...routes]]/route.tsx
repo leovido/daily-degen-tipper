@@ -180,6 +180,7 @@ app.frame('/check', async (c) => {
     intents: [
       frameData !== undefined && groupedArray.length > 1 && <Button value="dec">←</Button>,
       frameData !== undefined && groupedArray.length > 1 && <Button value="inc">→</Button>,
+      frameData !== undefined && groupedArray.length <= 1 && <Button action='/check' value="check">Refresh</Button>,
       frameData !== undefined && groupedArray.length <= 1 && <Button.Link href="https://warpcast.com/deployer/0x388a831b">L3 🍖 news</Button.Link>,
       frameData !== undefined && <Button.Link href="https://ham.fun">Visit ham.fun</Button.Link>,
     ],
