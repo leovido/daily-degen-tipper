@@ -295,7 +295,8 @@ app.frame('/check', async (c) => {
     ),
     intents: [
       frameData !== undefined && groupedArray.length > 1 && <Button value="dec">←</Button>,
-      frameData !== undefined && groupedArray.length > 1 && <Button value="inc">→</Button>
+      frameData !== undefined && groupedArray.length > 1 && <Button value="inc">→</Button>,
+      frameData !== undefined && <Button action='/check' value="check">Refresh</Button>
     ],
   })
 })
