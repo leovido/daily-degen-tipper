@@ -88,7 +88,8 @@ app.frame('/', async (c) => {
           width: '100%',
         }}
       >
-        <h1 style={{fontFamily: 'DM Serif Display', fontSize: 70, color: '#D6FFF6'}}>Who did I tip today?</h1>
+        <h1 style={{fontFamily: 'DM Serif Display', fontSize: 80, color: '#D6FFF6'}}>Who did I tip today?</h1>
+        <h1 style={{fontFamily: 'DM Serif Display', fontSize: 65, color: '#D6FFF6'}}>🎩 $DEGEN edition 🎩</h1>
         <h4 style={{fontSize: 35, color: '#D6FFF6'}}>by @leovido.eth</h4>
       </div>
     ),
