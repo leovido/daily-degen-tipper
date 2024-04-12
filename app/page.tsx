@@ -1,6 +1,5 @@
 import { getFrameMetadata } from 'frog/next'
 import type { Metadata } from 'next'
-import Image from 'next/image'
 
 import styles from './page.module.css'
 
@@ -9,6 +8,14 @@ export async function generateMetadata(): Promise<Metadata> {
     `${process.env.VERCEL_URL || 'http://localhost:3000'}/api`,
   )
   return {
+    title: "Who did I tip?",
+    description: "FC frames for $DEGEN and LP Ham",
+    authors: [{
+      name: "@leovido.eth",
+      url: "https://github.com/leovido"
+    }],
+    applicationName: "Who did I tip? FC frames",
+    creator: "@leovido.eth",
     other: frameTags,
   }
 }
@@ -16,12 +23,12 @@ export async function generateMetadata(): Promise<Metadata> {
 export default function Home() {
   return (
     <main className={styles.main}>
-      <div className={styles.description}>
-        <h1>Daily degen tipper</h1>
-        <a href="https://warpcast.com/leovido.eth/0xd6e20741">
-          $DEGEN and LP editons of "Who did I tip today?"
+      <h1>$DEGEN and LP editons of "Who did I tip today?"</h1>
+      <button className={styles.button}>
+        <a href="https://warpcast.com/leovido.eth/0xd6e20741" target='_blank'>
+          Check it out on Warpcast
         </a>
-      </div>
+      </button> 
     </main>
   )
 }
