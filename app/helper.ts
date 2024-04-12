@@ -11,7 +11,7 @@ export const isWithinTimeRange = (today: Date = new Date(), timestamp: string) =
       yesterday.setDate(yesterday.getDate() - 1)
       yesterday.setUTCHours(7, 35, 0, 0);
 
-      const todayEnd = new Date(tomorrow);
+      const todayEnd = new Date(today);
       todayEnd.setUTCHours(7, 34, 59, 999);
  
       return date >= yesterday && date <= todayEnd
