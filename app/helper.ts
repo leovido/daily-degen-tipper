@@ -1,5 +1,11 @@
 import { CastParentAuthorAllOf, CastWithInteractions } from "@neynar/nodejs-sdk/build/neynar-api/v1";
 
+export interface CastWithTimestamp {
+  author: CastParentAuthorAllOf;
+  text: string;
+  timestamp: string;
+}
+
 export const isWithinTimeRange = (today: Date = new Date(), timestamp: string) => {
     const date = new Date(timestamp);
     const tomorrow = new Date(today);

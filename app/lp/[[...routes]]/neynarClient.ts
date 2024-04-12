@@ -1,12 +1,5 @@
 import { neynarClient } from "@/app/client";
-import { castWithTimeFormatting, isWithinTimeRangeLP } from "@/app/helper";
-import { CastParentAuthorAllOf } from "@neynar/nodejs-sdk/build/neynar-api/v1";
-
-interface CastWithTimestamp {
-  author: CastParentAuthorAllOf;
-  text: string;
-  timestamp: string;
-}
+import { CastWithTimestamp, castWithTimeFormatting, isWithinTimeRangeLP } from "@/app/helper";
 
 const castWithMatchedHam = (cast: CastWithTimestamp) => {
   const pattern = /(🍖)\s*x?\s*(\d+)/;
