@@ -18,7 +18,9 @@ export default function Home() {
     <main className={styles.main}>
       <div className={styles.description}>
         <h1>Daily degen tipper</h1>
-        <p>Head over to /api</p>
+        <a href="https://warpcast.com/leovido.eth/0xd6e20741">
+          $DEGEN and LP editons of "Who did I tip today?"
+        </a>
       </div>
     </main>
   )

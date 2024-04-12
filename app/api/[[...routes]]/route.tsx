@@ -64,7 +64,7 @@ const app = new Frog<{ State: State }>({
 })
 
 // Uncomment to use Edge Runtime
-export const runtime = 'edge'
+// export const runtime = 'edge'
 
 const client = new NeynarAPIClient(process.env.NEYNAR_API_KEY || ""); 
 
