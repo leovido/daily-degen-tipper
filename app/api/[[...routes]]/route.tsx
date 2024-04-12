@@ -5,14 +5,8 @@ import { devtools } from 'frog/dev'
 import { handle } from 'frog/next'
 import { serveStatic } from 'frog/serve-static'
 import { NeynarAPIClient } from "@neynar/nodejs-sdk";
-import { isWithinTimeRange } from "../../helper";
 import { vars } from './ui'
-
-interface FCUser {
-  username: string,
-  degenValue?: string,
-  timestamp: string
-}
+import {client} from './client'
 
 interface DegenResponse {
   snapshot_date: string,
@@ -65,8 +59,6 @@ const app = new Frog<{ State: State }>({
 
 // Uncomment to use Edge Runtime
 // export const runtime = 'edge'
-
-const client = new NeynarAPIClient(process.env.NEYNAR_API_KEY || ""); 
 
 app.frame('/', async (c) => {
   return c.res({
@@ -128,18 +120,33 @@ app.frame('/check', async (c) => {
     })
   }
 
+  const state = deriveState(previousState => {
+    if (buttonIndex === 2 && buttonValue !== "check") previousState.count++
+    if (buttonIndex === 1 && buttonValue !== "check") previousState.count--
+  })
+
   const fid = frameData?.fid || 0;
 
-  const request = await fetch(`https://www.degen.tips/api/airdrop2/tip-allowance?fid=${fid}`,
+  const request = await fetch(
+    `https://www.degen.tips/api/airdrop2/tip-allowance?fid=${fid}`,
     {
       headers: {
         'Content-Type': 'application/json',
         'Content-Encoding': 'gzip'
       },
     }
-  )
+  ).catch((e) => {
+    console.error(`degen.tips: ${e}`)
+
+    throw new Error(`degen.tips: ${e}`)
+  })
 
   const json: DegenResponse[] = await request.json()
+    .catch((e) => {
+      console.error(`degen.tips json: ${e}`)
+
+      throw new Error(`degen.tips json: ${e}`)
+    })
 
   if (json.length === 0) {
     return c.res({
@@ -171,69 +178,13 @@ app.frame('/check', async (c) => {
   })?.tip_allowance || 0
 
   const date = new Date()
-  
-  const allCasts = await client.fetchAllCastsCreatedByUser(fid, {
-    limit: 100
-  })
-  const fff = allCasts.result.casts.filter((cast) => {
-    return isWithinTimeRange(date, cast.timestamp)
-  })
-  .map((cast) => {
-    const castDate = new Date(cast.timestamp)
-    const hours = castDate.getUTCHours()
-    const minutes = castDate.getUTCMinutes()
+  const items = await client(fid, date)
+  .catch((e) => {
+    console.error(`client items error: ${e}`)
 
-    const formattedTime = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
-
-    return {
-      author: cast.parentAuthor,
-      text: cast.text,
-      timestamp: `${formattedTime}`
-    }
-  })
-  .map((cast) => {
-    const pattern = /\b\d+ \$DEGEN\b/
-    const match = cast.text.match(pattern)
-  
-    if (match !== null) {
-      return {
-        degenValue: match[0] || '',
-        author: cast.author.fid || '',
-        timestamp: cast.timestamp
-      }
-    }
-  })
-  .filter((value) => {
-    return value !== undefined
-  })
-  .map(async (value) => {
-    if (value) {
-      const response = await client.fetchBulkUsers([Number(value.author)])
-
-      const user = response.users.find((user) => {
-        return user.username
-      })
-
-      const val: FCUser = {
-        username: user?.username || '',
-        degenValue: value?.degenValue,
-        timestamp: value?.timestamp
-      }
-
-      return val
-    }
-  })
-  .map(async (user) => {
-    const u: FCUser | undefined = await user
-    
-    return u
+    throw new Error(`client items error: ${e}`)
   })
 
-  const requestUser = await Promise.all(
-    fff
-  )
-
-  const items = await requestUser
   const totalDegen = items.reduce((acc, item) => {
     if (item) {
       const amount = (item.degenValue?.match(/\d+/) ?? [0])[0] ?? 0;
@@ -247,11 +198,6 @@ app.frame('/check', async (c) => {
   const groupedArray = Array.from({ length: Math.ceil(items.length / 5) }, (_, index) =>
     items.slice(index * 5, index * 5 + 5)
   );
-
-  const state = deriveState(previousState => {
-    if (buttonIndex === 2 && buttonValue !== "check") previousState.count++
-    if (buttonIndex === 1 && buttonValue !== "check") previousState.count--
-  })
 
   return c.res({
     image: (
@@ -281,7 +227,7 @@ app.frame('/check', async (c) => {
           </div>
         ))}
         {frameData !== undefined && groupedArray.length > 0 && 
-          <p style={{fontFamily: 'Open Sans', fontWeight: 700, fontSize: 45, color: '#3dd68c'}}>TOTAL: {totalDegen}/{allowance} $DEGEN</p>
+          <p style={{fontFamily: 'Open Sans', fontWeight: 700, fontSize: 45, color: '#2CFA1F'}}>TOTAL: {totalDegen}/{allowance} $DEGEN - REMAINING: {Number(allowance) - totalDegen}</p>
         }
         {frameData !== undefined && groupedArray.length === 0 && 
           <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>

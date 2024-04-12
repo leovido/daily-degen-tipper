@@ -76,6 +76,11 @@ app.frame('/check', async (c) => {
     })
   }
 
+  const state = deriveState(previousState => {
+    if (buttonIndex === 2 && buttonValue !== "check") previousState.count++
+    if (buttonIndex === 1 && buttonValue !== "check") previousState.count--
+  })
+
   const fetchAllowance = await fetch(
     `https://farcaster.dep.dev/lp/tips/${fid}`,
     {
@@ -84,9 +89,19 @@ app.frame('/check', async (c) => {
         'Content-Encoding': 'gzip'
       },
     }
-  )
+  ).catch((e) => {
+    console.error(`fetchAllowance: ${e}`)
 
-  const {allowance} = await fetchAllowance.json()
+    throw new Error(`fetchAllowance: ${e}`);
+  })
+
+  const {allowance} = await fetchAllowance
+    .json()
+    .catch((e) => {
+      console.error(`fetchAllowance: ${e}`)
+
+      throw new Error(`allowance: ${e}`);
+    })
 
   if (allowance === 0) {
     return c.res({
@@ -119,6 +134,12 @@ app.frame('/check', async (c) => {
   const date = new Date()
 
   const items = await client(fid, date)
+    .catch((e) => {
+      console.error(`client items: ${e}`)
+
+      throw new Error(`client items: ${e}`);
+    })
+
   const totalHam = items.reduce((acc, item) => {
     if (item) {
       const amount = (item.hamValue?.match(/\d+/) ?? [0])[0] ?? 0;
@@ -132,11 +153,6 @@ app.frame('/check', async (c) => {
   const groupedArray = Array.from({ length: Math.ceil(items.length / 5) }, (_, index) =>
     items.slice(index * 5, index * 5 + 5)
   );
-
-  const state = deriveState(previousState => {
-    if (buttonIndex === 2 && buttonValue !== "check") previousState.count++
-    if (buttonIndex === 1 && buttonValue !== "check") previousState.count--
-  })
 
   return c.res({
     image: (
@@ -166,7 +182,7 @@ app.frame('/check', async (c) => {
           </div>
         ))}
         {groupedArray.length > 0 && 
-          <p style={{fontSize: 55, color: '#3dd68c'}}>TOTAL: {totalHam}/{Math.trunc(allowance)} 🍖</p>
+          <p style={{fontSize: 55, color: '#2CFA1F'}}>TOTAL🍖: {totalHam}/{Math.trunc(allowance)} - REMAINING: {Math.trunc(allowance) - totalHam}</p>
         }
         {groupedArray.length === 0 && 
         <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
