@@ -2,13 +2,11 @@
 
 import { Button, Frog } from 'frog'
 import { devtools } from 'frog/dev'
-// import { neynar } from 'frog/hubs'
 import { handle } from 'frog/next'
 import { serveStatic } from 'frog/serve-static'
 import { NeynarAPIClient } from "@neynar/nodejs-sdk";
 import { isWithinTimeRange } from "../../helper";
 import { vars } from './ui'
-import { mockItems } from './mockFCUser';
 
 interface FCUser {
   username: string,
@@ -66,7 +64,7 @@ const app = new Frog<{ State: State }>({
 })
 
 // Uncomment to use Edge Runtime
-// export const runtime = 'edge'
+export const runtime = 'edge'
 
 const client = new NeynarAPIClient(process.env.NEYNAR_API_KEY || ""); 
 

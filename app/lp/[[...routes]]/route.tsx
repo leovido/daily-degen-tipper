@@ -41,7 +41,7 @@ const app = new Frog<{ State: State }>({
 })
 
 // Uncomment to use Edge Runtime
-// export const runtime = 'edge'
+export const runtime = 'edge'
 
 app.frame('/check', async (c) => {
   const { buttonIndex, buttonValue, frameData, deriveState, verified } = c
