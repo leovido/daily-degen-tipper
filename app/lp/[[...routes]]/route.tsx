@@ -185,13 +185,13 @@ app.frame('/check', async (c) => {
           </div>
         ))}
         {groupedArray.length > 0 && 
-          <p style={{fontSize: 55, color: '#2CFA1F'}}>TOTAL🍖: {totalHam}/{Math.trunc(allowance)} - REMAINING: {Math.trunc(allowance) - totalHam}</p>
+          <p style={{fontSize: 55, color: '#2CFA1F'}}>TOTAL🍖: {`${totalHam}`}/{Math.trunc(allowance)} - REMAINING: {`${Math.trunc(allowance) - totalHam}`}</p>
         }
         {groupedArray.length === 0 && 
         <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
           <p style={{fontSize: 45, color: '#D6FFF6'}}>You haven't tipped 🍖 today</p>
           <p style={{fontSize: 45, color: '#D6FFF6'}}>Tip artists, musicians, devs, leaders, etc.</p>
-          <p style={{fontSize: 45, color: '#3dd68c', fontWeight: 700}}>Your allowance: {Math.trunc(allowance)} 🍖</p>
+          <p style={{fontSize: 45, color: '#2CFA1F', fontWeight: 700}}>Your allowance: {Math.trunc(allowance)} 🍖</p>
           </div>
         }
         </div>
