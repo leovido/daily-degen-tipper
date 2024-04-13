@@ -54,7 +54,7 @@ export const isWithinTimeRangeLP = (today: Date = new Date(), timestamp: string)
       yesterday.setDate(yesterday.getDate() - 1)
       yesterday.setUTCHours(4, 30, 0, 0);
 
-      const todayEnd = new Date(tomorrow);
+      const todayEnd = new Date();
       todayEnd.setUTCHours(4, 29, 59, 999);
  
       return date >= yesterday && date <= todayEnd
