@@ -14,7 +14,7 @@ export const isWithinTimeRange = (today: Date = new Date(), timestamp: string) =
     const deadlineToday = `${today.getUTCHours()}${today.getUTCMinutes()}`
     const deadlineNumber = Number(deadlineToday)
 
-    if (deadlineNumber < 735) {
+    if (today.getUTCHours() > 0 && today.getUTCHours() < 8) {
       const yesterday = new Date(today)
       yesterday.setDate(yesterday.getDate() - 1)
       yesterday.setUTCHours(7, 35, 0, 0);
@@ -49,7 +49,7 @@ export const isWithinTimeRangeLP = (today: Date = new Date(), timestamp: string)
     const deadlineToday = `${today.getUTCHours()}${today.getUTCMinutes()}`
     const deadlineNumber = Number(deadlineToday)
 
-    if (deadlineNumber < 430) {
+    if (today.getUTCHours() > 0 && today.getUTCHours() < 5) {
       const yesterday = new Date(today)
       yesterday.setDate(yesterday.getDate() - 1)
       yesterday.setUTCHours(4, 30, 0, 0);

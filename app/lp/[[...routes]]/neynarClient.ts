@@ -24,7 +24,7 @@ export const client = async (fid: number, date: Date) => {
       const formattedCast = castWithTimeFormatting(cast);
       return castWithMatchedHam(formattedCast);
     })
-    .filter(cast => cast !== undefined); // Assuming castWithMatchedHam can return undefined
+    .filter(cast => cast !== undefined);
   
   const usersInfo = await Promise.all(filteredAndFormattedCasts.map(async (cast) => {
     if (!cast) return;

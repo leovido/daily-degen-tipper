@@ -98,7 +98,7 @@ app.frame('/check', async (c) => {
     throw new Error(`fetchAllowance: ${e}`);
   })
 
-  const {allowance} = await fetchAllowance
+  const {allowance: allowanceResponse} = await fetchAllowance
     .json()
     .catch((e) => {
       console.error(`fetchAllowance: ${e}`)
@@ -106,7 +106,7 @@ app.frame('/check', async (c) => {
       throw new Error(`allowance: ${e}`);
     })
 
-  if (allowance === 0) {
+  if (allowanceResponse === 0) {
     return c.res({
       image: (
         <div
@@ -153,6 +153,10 @@ app.frame('/check', async (c) => {
     }
   }, 0);
 
+  const allowance = Math.trunc(allowanceResponse)
+  const remainingHam = allowance - totalHam
+
+
   const groupedArray = Array.from({ length: Math.ceil(items.length / 5) }, (_, index) =>
     items.slice(index * 5, index * 5 + 5)
   );
@@ -185,13 +189,13 @@ app.frame('/check', async (c) => {
           </div>
         ))}
         {groupedArray.length > 0 && 
-          <p style={{fontSize: 55, color: '#2CFA1F'}}>TOTAL🍖: {`${totalHam}`}/{Math.trunc(allowance)} - REMAINING: {`${Math.trunc(allowance) - totalHam}`}</p>
+          <p style={{fontSize: 55, color: '#2CFA1F'}}>TOTAL🍖: {`${totalHam}`}/{allowance} - REMAINING: {`${remainingHam}`}</p>
         }
         {groupedArray.length === 0 && 
         <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
           <p style={{fontSize: 45, color: '#D6FFF6'}}>You haven't tipped 🍖 today</p>
           <p style={{fontSize: 45, color: '#D6FFF6'}}>Tip artists, musicians, devs, leaders, etc.</p>
-          <p style={{fontSize: 45, color: '#2CFA1F', fontWeight: 700}}>Your allowance: {Math.trunc(allowance)} 🍖</p>
+          <p style={{fontSize: 45, color: '#2CFA1F', fontWeight: 700}}>Your allowance: {allowance} 🍖</p>
           </div>
         }
         </div>
