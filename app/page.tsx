@@ -23,7 +23,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default function Home() {
   return (
     <main className={styles.main}>
-      <h1>$DEGEN and LP editons of "Who did I tip today?"</h1>
+      <h1 style={{color: 'white'}}>$DEGEN and LP editons of "Who did I tip today?"</h1>
       <button className={styles.button}>
         <a href="https://warpcast.com/leovido.eth/0xd6e20741" target='_blank'>
           Check it out on Warpcast
