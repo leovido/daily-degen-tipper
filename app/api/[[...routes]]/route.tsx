@@ -134,6 +134,9 @@ app.frame('/check', async (c) => {
         'Content-Type': 'application/json',
         'Content-Encoding': 'gzip'
       },
+      next: {
+        revalidate: 3600, // 1 hour
+      },
     }
   ).catch((e) => {
     console.error(`degen.tips: ${e}`)
