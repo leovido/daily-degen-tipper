@@ -88,6 +88,9 @@ app.frame('/check', async (c) => {
         'Content-Type': 'application/json',
         'Content-Encoding': 'gzip'
       },
+      next: {
+        revalidate: 3600
+      }
     }
   ).catch((e) => {
     console.error(`fetchAllowance: ${e}`)
