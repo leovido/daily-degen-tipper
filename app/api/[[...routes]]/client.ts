@@ -1,13 +1,16 @@
 import { neynarClient } from "@/app/client"
 import { castWithTimeFormatting, isWithinTimeRange } from "@/app/helper"
 
-interface FCUser {
+export interface FCUser {
   username: string,
   degenValue?: string,
   timestamp: string
 }
 
 export const client = async (fid: number, date: Date) => {
+  if (process.env.CONFIG === 'DEV') {
+    console.log('making a request...')
+  }
   const allCasts = await neynarClient.fetchAllCastsCreatedByUser(fid, {
     limit: 100
   })

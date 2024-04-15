@@ -5,7 +5,7 @@ import { devtools } from 'frog/dev'
 import { handle } from 'frog/next'
 import { serveStatic } from 'frog/serve-static'
 import { vars } from './ui'
-import {client} from './client'
+import {FCUser, client} from './client'
 import { mockDegenResponse } from './mockDegenResponse'
 import { DegenResponse } from './types'
 import { mockItems } from './mockFCUser'
@@ -15,6 +15,8 @@ type State = {
   currentPage: number;
   pages: number;
   pageState: PageState;
+  items: (FCUser | undefined)[][];
+  totalDegen: number;
 }
 
 enum PageState {
@@ -24,18 +26,48 @@ enum PageState {
   END
 }
 
+const firstRun = async (fid: number, date: Date, forceRefresh: boolean) => {
+  const willRun = forceRefresh && process.env.CONFIG === "DEV"
+  const items = willRun ? await client(fid, date)
+  .catch((e) => {
+    console.error(`client items error: ${e}`)
+
+    throw new Error(`client items error: ${e}`)
+  }) : []
+
+  const totalDegen = items.reduce((acc, item) => {
+    if (item) {
+      const amount = (item.degenValue?.match(/\d+/) ?? [0])[0] ?? 0;
+
+      return acc + Number(amount) 
+    } else {
+      return acc + 0
+    }
+  }, 0);
+
+  const groupedArray = Array.from({ length: Math.ceil(items.length / 5) }, (_, index) =>
+    items.slice(index * 5, index * 5 + 5)
+  );
+
+  return {
+    totalDegen,
+    groupedArray
+  }
+}
+
 const generateIntents = (pageState: PageState) => {
   switch (pageState) {
     case PageState.EMPTY:
-      let url = 'https://warpcast.com/~/channel/'
+      let url = 'https://warpcast.com/~/channel'
 
       const randomChannel = boostedChannels[Math.floor(Math.random()* boostedChannels.length)];
-      url.concat(randomChannel)
+      
+      const updatedURL = `${url}${randomChannel.toLowerCase()}`
 
       return [
         <Button action='/check' value="check">Refresh</Button>,
         <Button.Link href="https://degen.tips">Visit degen.tips</Button.Link>,
-        <Button.Link href={url}>Visit random boosted channel</Button.Link>,
+        <Button.Link href={updatedURL}>Visit random boosted channel</Button.Link>,
         <Button.Link href="https://warpcast.com/leovido.eth/0xd6e20741">Tip 🎩</Button.Link>,
       ]
     case PageState.BEGINNING:
@@ -65,7 +97,9 @@ const app = new Frog<{ State: State }>({
   initialState: {
     currentPage: 0,
     pages: 0,
-    pageState: PageState.EMPTY
+    pageState: PageState.EMPTY,
+    items: [],
+    totalDegen: 0
   },
   imageAspectRatio: '1:1',
   assetsPath: '/',
@@ -132,9 +166,10 @@ app.frame('/', async (c) => {
 })
 
 app.frame('/check', async (c) => {
-  const { buttonValue, buttonIndex, frameData, deriveState, verified } = c
+  const { buttonValue, frameData, deriveState, verified } = c
+  const forceRefresh = buttonValue === 'check'
 
-  const isDevEnvironment = process.env.CONFIG === 'DEV'
+  const isDevEnvironment = process.env.CONFIG !== 'DEV'
 
   if (!verified) {
     console.log(`Frame verification failed for ${frameData?.fid}`)
@@ -164,7 +199,7 @@ app.frame('/check', async (c) => {
     })
   }
 
-  const fid = frameData?.fid || 0;
+  const fid = 307834
 
   const request = !isDevEnvironment ? await fetch(
     `https://www.degen.tips/api/airdrop2/tip-allowance?fid=${fid}`,
@@ -220,61 +255,46 @@ app.frame('/check', async (c) => {
   })?.tip_allowance || 0
 
   const date = new Date()
-  const items = !isDevEnvironment ? await client(fid, date)
-  .catch((e) => {
-    console.error(`client items error: ${e}`)
-
-    throw new Error(`client items error: ${e}`)
-  }) : mockItems
-
-  const totalDegen = items.reduce((acc, item) => {
-    if (item) {
-      const amount = (item.degenValue?.match(/\d+/) ?? [0])[0] ?? 0;
-
-      return acc + Number(amount) 
-    } else {
-      return acc + 0
-    }
-  }, 0);
-
-  const groupedArray = Array.from({ length: Math.ceil(items.length / 5) }, (_, index) =>
-    items.slice(index * 5, index * 5 + 5)
-  );
+  const {totalDegen: total, groupedArray: grouped} = await firstRun(fid, date, forceRefresh)
 
   const state = deriveState(previousState => {
-    previousState.pages = groupedArray.length
-
-    if (previousState.currentPage === 0 && groupedArray.length === 0) {
-      previousState.pageState = PageState.EMPTY
+    switch (buttonValue) {
+      case "dec":
+          previousState.currentPage = Math.max(0, previousState.currentPage - 1);
+          break;
+      case "inc":
+          previousState.currentPage = Math.min(previousState.pages - 1, previousState.currentPage + 1);
+          break;
+      case "pageOne":
+          previousState.currentPage = 0;
+          previousState.pageState = PageState.BEGINNING;
+          break;
+      case "refresh":
+      case "check":
+        previousState.totalDegen = total;
+        previousState.pages = grouped.length;
+        previousState.items = grouped;
+        break;
+      default:
+        break;
     }
 
-    if (previousState.pages > 1 && previousState.currentPage === 0) {
-      previousState.pageState = PageState.BEGINNING
-      if (buttonIndex === 3 && buttonValue !== "check") previousState.currentPage++
+    if (previousState.pages === 1) {
+        previousState.pageState = PageState.EMPTY;
+    } else if (previousState.pages === 1) {
+        previousState.pageState = PageState.BEGINNING; // or END if only one page exists
+    } else if (previousState.currentPage === 0) {
+        previousState.pageState = PageState.BEGINNING;
+    } else if (previousState.currentPage === previousState.pages - 1) {
+        previousState.pageState = PageState.END;
+    } else if (previousState.currentPage > 0 && previousState.currentPage < previousState.pages - 1) {
+        previousState.pageState = PageState.MIDDLE;
     }
+  });
 
-    if (previousState.pages === previousState.currentPage + 1) {
-      previousState.pageState = PageState.END
-    }
-
-    if (previousState.currentPage + 2 < previousState.pages) {
-      previousState.pageState = PageState.MIDDLE
-    }
-
-    if (buttonValue === 'pageOne') {
-      previousState.currentPage = 0
-    }
-
-    if (previousState.pageState === PageState.BEGINNING) {
-      if (buttonIndex === 4 && buttonValue !== "check") previousState.currentPage++
-    }
-
-    if (previousState.pageState === PageState.MIDDLE || previousState.pageState === PageState.END) {
-      if (buttonIndex === 3 && buttonValue !== "check") previousState.currentPage--
-    }
-  })
-
-  const page = `${state.currentPage + 1}/${state.pages}`
+  const page = `${state.currentPage + 1}/${state.pages}`;
+  const totalDegen = forceRefresh ? total : state.totalDegen;
+  const groupedArray = forceRefresh ? grouped : state.items;
 
   return c.res({
     image: (
@@ -293,7 +313,7 @@ app.frame('/check', async (c) => {
       >
         <h1 style={{flex: 1, fontFamily: 'DM Serif Display', fontSize: '3rem', color: '#D6FFF6'}}>🎩 Who did I tip today? 🎩</h1>
 
-        <p style={{color: 'white'}}>{page}</p>
+        {state.pages > 0 && <p style={{color: 'white'}}>{page}</p>}
         {groupedArray.length > 0 && 
           <div style={{ display: 'flex', flexDirection: 'column', width: '50%', backgroundColor: 'rgba(23, 16, 31, 0.75)', borderRadius: 25, borderWidth: 2, borderColor: '#ffffff' }}>
             {groupedArray[state.currentPage].map((u, index) => (
