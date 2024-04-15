@@ -199,7 +199,7 @@ app.frame('/check', async (c) => {
     })
   }
 
-  const fid = 307834
+  const fid = frameData?.fid || 0
 
   const request = !isDevEnvironment ? await fetch(
     `https://www.degen.tips/api/airdrop2/tip-allowance?fid=${fid}`,
