@@ -220,7 +220,7 @@ app.frame('/check', async (c) => {
       console.error(`degen.tips json: ${e}`)
 
       throw new Error(`degen.tips json: ${e}`)
-    }) : mockDegenResponse
+    }) : []
 
   if (json.length === 0) {
     return c.res({
@@ -279,7 +279,7 @@ app.frame('/check', async (c) => {
     if (previousState.pages === 1) {
         previousState.pageState = PageState.EMPTY;
     } else if (previousState.pages === 1) {
-        previousState.pageState = PageState.BEGINNING; // or END if only one page exists
+        previousState.pageState = PageState.BEGINNING;
     } else if (previousState.currentPage === 0) {
         previousState.pageState = PageState.BEGINNING;
     } else if (previousState.currentPage === previousState.pages - 1) {
@@ -355,7 +355,6 @@ app.frame('/check', async (c) => {
     intents: generateIntents(state.pageState),
   })
 })
-
 
 devtools(app, { serveStatic })
 
