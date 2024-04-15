@@ -4,28 +4,70 @@ import { Button, Frog } from 'frog'
 import { devtools } from 'frog/dev'
 import { handle } from 'frog/next'
 import { serveStatic } from 'frog/serve-static'
-import { NeynarAPIClient } from "@neynar/nodejs-sdk";
 import { vars } from './ui'
 import {client} from './client'
-
-interface DegenResponse {
-  snapshot_date: string,
-  user_rank: string,
-  wallet_address: string,
-  avatar_url: string,
-  display_name: string,
-  tip_allowance: string,
-  remaining_allowance: string
-}
+import { mockDegenResponse } from './mockDegenResponse'
+import { DegenResponse } from './types'
+import { mockItems } from './mockFCUser'
+import { boostedChannels } from './pill'
 
 type State = {
-  count: number
+  currentPage: number;
+  pages: number;
+  pageState: PageState;
+}
+
+enum PageState {
+  EMPTY,
+  BEGINNING,
+  MIDDLE,
+  END
+}
+
+const generateIntents = (pageState: PageState) => {
+  switch (pageState) {
+    case PageState.EMPTY:
+      let url = 'https://warpcast.com/~/channel/'
+
+      const randomChannel = boostedChannels[Math.floor(Math.random()* boostedChannels.length)];
+      url.concat(randomChannel)
+
+      return [
+        <Button action='/check' value="check">Refresh</Button>,
+        <Button.Link href="https://degen.tips">Visit degen.tips</Button.Link>,
+        <Button.Link href={url}>Visit random boosted channel</Button.Link>,
+        <Button.Link href="https://warpcast.com/leovido.eth/0xd6e20741">Tip 🎩</Button.Link>,
+      ]
+    case PageState.BEGINNING:
+      return [
+        <Button action='/check' value="check">Refresh</Button>,
+        <Button.Link href="https://warpcast.com/leovido.eth/0xd6e20741">Tip 🎩</Button.Link>,
+        <Button value="inc">→</Button>
+      ]
+    case PageState.MIDDLE:
+      return [
+        <Button action='/check' value="check">Refresh</Button>,
+        <Button.Link href="https://warpcast.com/leovido.eth/0xd6e20741">Tip 🎩</Button.Link>,
+        <Button value="dec">←</Button>,
+        <Button value="inc">→</Button>
+      ]
+    case PageState.END:
+      return [
+        <Button action='/check' value="check">Refresh</Button>,
+        <Button.Link href="https://warpcast.com/leovido.eth/0xd6e20741">Tip 🎩</Button.Link>,
+        <Button value="dec">←</Button>,
+        <Button value="pageOne">Page 1</Button>
+      ]
+  }
 }
 
 const app = new Frog<{ State: State }>({
   initialState: {
-    count: 0
+    currentPage: 0,
+    pages: 0,
+    pageState: PageState.EMPTY
   },
+  imageAspectRatio: '1:1',
   assetsPath: '/',
   basePath: '/api',
   ui: { vars },
@@ -78,9 +120,9 @@ app.frame('/', async (c) => {
           width: '100%',
         }}
       >
-        <h1 style={{fontFamily: 'DM Serif Display', fontSize: 80, color: '#D6FFF6'}}>Who did I tip today?</h1>
-        <h1 style={{fontFamily: 'DM Serif Display', fontSize: 65, color: '#D6FFF6'}}>🎩 $DEGEN edition 🎩</h1>
-        <h4 style={{fontSize: 35, color: '#D6FFF6'}}>by @leovido.eth</h4>
+        <h1 style={{fontFamily: 'DM Serif Display', fontSize: '3rem', color: '#D6FFF6'}}>Who did I tip today?</h1>
+        <h1 style={{fontFamily: 'DM Serif Display', fontSize: '2.5rem', color: '#D6FFF6'}}>🎩 $DEGEN edition 🎩</h1>
+        <h4 style={{fontSize: '1.75rem', color: '#D6FFF6', fontWeight: 400}}>Made with ❤ by @leovido.eth</h4>
       </div>
     ),
     intents: [
@@ -91,6 +133,8 @@ app.frame('/', async (c) => {
 
 app.frame('/check', async (c) => {
   const { buttonValue, buttonIndex, frameData, deriveState, verified } = c
+
+  const isDevEnvironment = process.env.CONFIG === 'DEV'
 
   if (!verified) {
     console.log(`Frame verification failed for ${frameData?.fid}`)
@@ -120,14 +164,9 @@ app.frame('/check', async (c) => {
     })
   }
 
-  const state = deriveState(previousState => {
-    if (buttonIndex === 2 && buttonValue !== "check") previousState.count++
-    if (buttonIndex === 1 && buttonValue !== "check") previousState.count--
-  })
-
   const fid = frameData?.fid || 0;
 
-  const request = await fetch(
+  const request = !isDevEnvironment ? await fetch(
     `https://www.degen.tips/api/airdrop2/tip-allowance?fid=${fid}`,
     {
       headers: {
@@ -142,14 +181,14 @@ app.frame('/check', async (c) => {
     console.error(`degen.tips: ${e}`)
 
     throw new Error(`degen.tips: ${e}`)
-  })
+  }) : undefined
 
-  const json: DegenResponse[] = await request.json()
+  const json: DegenResponse[] = !isDevEnvironment ? await request.json()
     .catch((e) => {
       console.error(`degen.tips json: ${e}`)
 
       throw new Error(`degen.tips json: ${e}`)
-    })
+    }) : mockDegenResponse
 
   if (json.length === 0) {
     return c.res({
@@ -181,12 +220,12 @@ app.frame('/check', async (c) => {
   })?.tip_allowance || 0
 
   const date = new Date()
-  const items = await client(fid, date)
+  const items = !isDevEnvironment ? await client(fid, date)
   .catch((e) => {
     console.error(`client items error: ${e}`)
 
     throw new Error(`client items error: ${e}`)
-  })
+  }) : mockItems
 
   const totalDegen = items.reduce((acc, item) => {
     if (item) {
@@ -202,6 +241,41 @@ app.frame('/check', async (c) => {
     items.slice(index * 5, index * 5 + 5)
   );
 
+  const state = deriveState(previousState => {
+    previousState.pages = groupedArray.length
+
+    if (previousState.currentPage === 0 && groupedArray.length === 0) {
+      previousState.pageState = PageState.EMPTY
+    }
+
+    if (previousState.pages > 1 && previousState.currentPage === 0) {
+      previousState.pageState = PageState.BEGINNING
+      if (buttonIndex === 3 && buttonValue !== "check") previousState.currentPage++
+    }
+
+    if (previousState.pages === previousState.currentPage + 1) {
+      previousState.pageState = PageState.END
+    }
+
+    if (previousState.currentPage + 2 < previousState.pages) {
+      previousState.pageState = PageState.MIDDLE
+    }
+
+    if (buttonValue === 'pageOne') {
+      previousState.currentPage = 0
+    }
+
+    if (previousState.pageState === PageState.BEGINNING) {
+      if (buttonIndex === 4 && buttonValue !== "check") previousState.currentPage++
+    }
+
+    if (previousState.pageState === PageState.MIDDLE || previousState.pageState === PageState.END) {
+      if (buttonIndex === 3 && buttonValue !== "check") previousState.currentPage--
+    }
+  })
+
+  const page = `${state.currentPage + 1}/${state.pages}`
+
   return c.res({
     image: (
       <div
@@ -214,40 +288,54 @@ app.frame('/check', async (c) => {
           flexDirection: 'column',
           flexWrap: 'nowrap',
           height: '100%',
-          justifyContent: 'center',
-          textAlign: 'center',
-          width: '100%',
+          justifyContent: 'space-around'
         }}
       >
-        <h1 style={{fontFamily: 'DM Serif Display', fontSize: 70, color: '#D6FFF6'}}>Who did I tip today?</h1>
+        <h1 style={{flex: 1, fontFamily: 'DM Serif Display', fontSize: '3rem', color: '#D6FFF6'}}>🎩 Who did I tip today? 🎩</h1>
 
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          {groupedArray.length > 0 && groupedArray[state.count].map((u, index) => (
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <p key={index} style={{fontFamily: "AvenirNext", fontSize: 35, color: '#D6FFF6'}}>
-            {`${(5 * state.count) + index + 1}. @${u?.username} - ${u?.degenValue} at ${u?.timestamp} UTC`}
-            </p>
+        <p style={{color: 'white'}}>{page}</p>
+        {groupedArray.length > 0 && 
+          <div style={{ display: 'flex', flexDirection: 'column', width: '50%', backgroundColor: 'rgba(23, 16, 31, 0.75)', borderRadius: 25, borderWidth: 2, borderColor: '#ffffff' }}>
+            {groupedArray[state.currentPage].map((u, index) => (
+            <div style={{ 
+                display: 'flex', 
+                flexDirection: 'row', 
+                padding: 4, 
+                paddingLeft: 8, 
+                paddingRight: 8, 
+                justifyContent: 'space-around', 
+                maxWidth: '100%' 
+              }}>
+              <h2 key={index} style={{ fontFamily: "AvenirNext", color: '#D6FFF6', fontWeight: 400}}>
+                  {`${(5 * state.currentPage) + index + 1}. @${u?.username}`}
+                </h2>
+              <h2 key={index} style={{ fontFamily: "AvenirNext", color: '#D6FFF6', fontWeight: 400}}>
+                {`${u?.degenValue}`}
+              </h2>
+              <h2 key={index} style={{ fontFamily: "AvenirNext", color: '#D6FFF6', fontWeight: 400}}>
+                {`at ${u?.timestamp} UTC`}
+              </h2>
+            </div>
+            ))}
           </div>
-        ))}
+        }
         {frameData !== undefined && groupedArray.length > 0 && 
-          <p style={{fontFamily: 'Open Sans', fontWeight: 700, fontSize: 45, color: '#2CFA1F'}}>TOTAL: {`${totalDegen}`}/{allowance} $DEGEN - REMAINING: {`${Number(allowance) - totalDegen}`}</p>
+          <h1 style={{fontFamily: 'Open Sans', fontWeight: 700, fontSize: 25, color: '#2CFA1F'}}>TOTAL: {`${totalDegen}`}/{allowance} $DEGEN - REMAINING: {`${Number(allowance) - totalDegen}`}</h1>
         }
         {frameData !== undefined && groupedArray.length === 0 && 
-          <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
-            <p style={{fontSize: 45, color: '#D6FFF6'}}>You haven't tipped today</p>
-            <p style={{fontSize: 45, color: '#D6FFF6'}}>Tip artists, musicians, devs, leaders, etc.</p>
-            <p style={{fontFamily: 'Open Sans', fontWeight: 700, fontSize: 45, color: '#2CFA1F'}}>Your allowance: {`${Number(allowance)}`}</p>
+          <div style={{display: 'flex', flexDirection: 'column', flex: 5, justifyContent: 'center', alignItems: 'center', alignContent: 'center'}}>
+            <h2 style={{ color: '#D6FFF6', fontWeight: 400 }}>You haven't tipped today</h2>
+            <h2 style={{ color: '#D6FFF6', fontWeight: 400 }}>Tips on casts in the following channels</h2>
+            <h2 style={{ color: '#D6FFF6', fontWeight: 400, marginTop: -16 }}>receive a 1.5x boost: </h2>
+            <h2 style={{ color: 'rgba(135, 206, 235, 1)', fontWeight: 700 }}>/farcastHER, /FarCon, /frames, /Base</h2>
+            <h2 style={{ color: 'rgba(135, 206, 235, 1)', fontWeight: 700, marginTop: -16 }}>/Dev, /Design, /Frontend, /Founders</h2>
+            <h2 style={{ color: 'rgba(135, 206, 235, 1)', fontWeight: 700, marginTop: -16 }}>/perl, /Product, and /Zora</h2>
+            <p style={{fontFamily: 'Open Sans', fontWeight: 700, fontSize: 25, color: '#2CFA1F'}}>Your allowance: {`${Number(allowance)}`}</p>
           </div>
         }
-        </div>
       </div>
     ),
-    intents: [
-      frameData !== undefined && groupedArray.length > 1 && <Button value="dec">←</Button>,
-      frameData !== undefined && groupedArray.length > 1 && <Button value="inc">→</Button>,
-      frameData !== undefined && <Button action='/check' value="check">Refresh</Button>,
-      frameData !== undefined && <Button.Link href="https://warpcast.com/leovido.eth/0xd6e20741">Tip 🎩</Button.Link>
-    ],
+    intents: generateIntents(state.pageState),
   })
 })
 
