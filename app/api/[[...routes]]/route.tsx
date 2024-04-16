@@ -201,7 +201,7 @@ app.frame('/check', async (c) => {
 
   const fid = frameData?.fid || 0
 
-  const request = !isDevEnvironment ? await fetch(
+  const request = await fetch(
     `https://www.degen.tips/api/airdrop2/tip-allowance?fid=${fid}`,
     {
       headers: {
@@ -213,7 +213,7 @@ app.frame('/check', async (c) => {
     console.error(`degen.tips: ${e}`)
 
     throw new Error(`degen.tips: ${e}`)
-  }) : undefined
+  })
 
   const json: DegenResponse[] = !isDevEnvironment ? await request.json()
     .catch((e) => {
