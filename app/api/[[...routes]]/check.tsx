@@ -87,8 +87,8 @@
 //           width: '100%',
 //         }}
 //       >
-//         <h1 style={{fontFamily: 'DM Serif Display', fontSize: 70, color: '#D6FFF6'}}>Sorry, your FID: {fid} is not eligible for S3 DEGEN tipping</h1> 
-//         <p style={{fontSize: 45, color: '#D6FFF6'}}>Visit https://degen.tips for more info</p>        
+//         <h1 style={{fontFamily: 'DM Serif Display', fontSize: 70, color: '#D6FFF6'}}>Sorry, your FID: {fid} is not eligible for S3 DEGEN tipping</h1>
+//         <p style={{fontSize: 45, color: '#D6FFF6'}}>Visit https://degen.tips for more info</p>
 //       </div>
 //       )
 //     })
@@ -110,7 +110,7 @@
 //     if (item) {
 //       const amount = (item.degenValue?.match(/\d+/) ?? [0])[0] ?? 0;
 
-//       return acc + Number(amount) 
+//       return acc + Number(amount)
 //     } else {
 //       return acc + 0
 //     }
@@ -140,17 +140,17 @@
 //         <h1 style={{flex: 1, fontFamily: 'DM Serif Display', fontSize: '3rem', color: '#D6FFF6'}}>🎩 Who did I tip today? 🎩</h1>
 
 //         <p style={{color: 'white'}}>{page}</p>
-//         {groupedArray.length > 0 && 
+//         {groupedArray.length > 0 &&
 //           <div style={{ display: 'flex', flexDirection: 'column', width: '50%', backgroundColor: 'rgba(23, 16, 31, 0.75)', borderRadius: 25, borderWidth: 2, borderColor: '#ffffff' }}>
 //             {groupedArray[state.count].map((u, index) => (
-//             <div style={{ 
-//                 display: 'flex', 
-//                 flexDirection: 'row', 
-//                 padding: 4, 
-//                 paddingLeft: 8, 
-//                 paddingRight: 8, 
-//                 justifyContent: 'space-around', 
-//                 maxWidth: '100%' 
+//             <div style={{
+//                 display: 'flex',
+//                 flexDirection: 'row',
+//                 padding: 4,
+//                 paddingLeft: 8,
+//                 paddingRight: 8,
+//                 justifyContent: 'space-around',
+//                 maxWidth: '100%'
 //               }}>
 //               <h2 key={index} style={{ fontFamily: "AvenirNext", color: '#D6FFF6', fontWeight: 400}}>
 //                   {`${(5 * state.count) + index + 1}. @${u?.username}`}
@@ -165,10 +165,10 @@
 //             ))}
 //           </div>
 //         }
-//         {frameData !== undefined && groupedArray.length > 0 && 
+//         {frameData !== undefined && groupedArray.length > 0 &&
 //           <h1 style={{fontFamily: 'Open Sans', fontWeight: 700, fontSize: 25, color: '#2CFA1F'}}>TOTAL: {`${totalDegen}`}/{allowance} $DEGEN - REMAINING: {`${Number(allowance) - totalDegen}`}</h1>
 //         }
-//         {frameData !== undefined && groupedArray.length === 0 && 
+//         {frameData !== undefined && groupedArray.length === 0 &&
 //           <div style={{display: 'flex', flexDirection: 'column', flex: 5, justifyContent: 'center', alignItems: 'center', alignContent: 'center'}}>
 //             <h2 style={{ color: '#D6FFF6', fontWeight: 400 }}>You haven't tipped today</h2>
 //             <h2 style={{ color: '#D6FFF6', fontWeight: 400 }}>Tips on casts in the following channels</h2>

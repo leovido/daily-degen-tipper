@@ -1,5 +1,5 @@
-import { calculateHamAmount, isWithinTimeRange, isWithinTimeRangeLP } from "../../../helper";
-import {describe, expect, it} from '@jest/globals';
+import { calculateHamAmount, isWithinTimeRange, isWithinTimeRangeLP } from '../../../helper'
+import { describe, expect, it } from '@jest/globals'
 
 describe('should pass', () => {
   it('should fail when it is yesterday', () => {
@@ -54,7 +54,7 @@ describe('should pass', () => {
     const today = new Date()
     const dateToday = new Date()
     dateToday.setUTCHours(7, 34)
-    
+
     const actual = isWithinTimeRange(today, dateToday.toUTCString())
     const expected = false
 
@@ -64,7 +64,7 @@ describe('should pass', () => {
   it('PASS - before 7:35', () => {
     const dateToday = new Date()
     dateToday.setUTCHours(7, 34, 59, 599)
-    
+
     const actual = isWithinTimeRange(dateToday, dateToday.toUTCString())
     const expected = true
 
@@ -72,38 +72,37 @@ describe('should pass', () => {
   })
 
   it('regex for ham', () => {
-    const actual = calculateHamAmount("🍖")
+    const actual = calculateHamAmount('🍖')
     const expected = 1
 
     expect(actual).toBe(expected)
   })
 
   it.skip('4 hams', () => {
-    const actual = calculateHamAmount("🍖🍖🍖🍖")
+    const actual = calculateHamAmount('🍖🍖🍖🍖')
     const expected = 4
 
     expect(actual).toBe(expected)
   })
 
   it('regex for ham multiplier', () => {
-    const actual = calculateHamAmount("🍖x20")
+    const actual = calculateHamAmount('🍖x20')
     const expected = 200
 
     expect(actual).toBe(expected)
   })
 
   it.skip('regex for ham multiplier and extra hams', () => {
-    const actual = calculateHamAmount("🍖🍖x20")
+    const actual = calculateHamAmount('🍖🍖x20')
     const expected = 201
 
     expect(actual).toBe(expected)
   })
 
   it('regex for ham multiplier with spaces', () => {
-    const actual = calculateHamAmount("🍖 x 10000")
+    const actual = calculateHamAmount('🍖 x 10000')
     const expected = 100000
 
     expect(actual).toBe(expected)
   })
-
 })

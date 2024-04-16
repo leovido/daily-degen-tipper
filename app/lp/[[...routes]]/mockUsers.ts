@@ -1,5 +1,5 @@
 export const mockHamItems = [
-{
+  {
     username: 'test',
     hamValue: '🍖',
     timestamp: '234'
@@ -29,10 +29,10 @@ export const mockHamItems = [
     hamValue: '🍖🍖 x 20',
     timestamp: '234'
   }
-  ]
+]
 
-  export const mockHamWithAmount = [
-{
+export const mockHamWithAmount = [
+  {
     username: 'test',
     hamValue: '20',
     timestamp: '234'
@@ -62,4 +62,4 @@ export const mockHamItems = [
     hamValue: '1',
     timestamp: '234'
   }
-  ]
+]

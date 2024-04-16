@@ -1,4 +1,4 @@
-import { DegenResponse } from "./types";
+import { type DegenResponse } from './types'
 
 export const mockDegenResponse: DegenResponse[] = [
   {

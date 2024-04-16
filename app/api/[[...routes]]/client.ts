@@ -1,9 +1,9 @@
-import { neynarClient } from "@/app/client"
-import { castWithTimeFormatting, isWithinTimeRange } from "@/app/helper"
+import { neynarClient } from '@/app/client'
+import { castWithTimeFormatting, isWithinTimeRange } from '@/app/helper'
 
 export interface FCUser {
-  username: string,
-  degenValue?: string,
+  username: string
+  degenValue?: string
   timestamp: string
 }
 
@@ -17,44 +17,44 @@ export const client = async (fid: number, date: Date) => {
   const filteredCasts = allCasts.result.casts.filter((cast) => {
     return isWithinTimeRange(date, cast.timestamp)
   })
-  .map((cast) => castWithTimeFormatting(cast))
-  .map((cast) => {
-    const pattern = /\b\d+ \$DEGEN\b/
-    const match = cast.text.match(pattern)
-  
-    if (match !== null) {
-      return {
-        degenValue: match[0] || '',
-        author: cast.author.fid || '',
-        timestamp: cast.timestamp
+    .map((cast) => castWithTimeFormatting(cast))
+    .map((cast) => {
+      const pattern = /\b\d+ \$DEGEN\b/
+      const match = cast.text.match(pattern)
+
+      if (match !== null) {
+        return {
+          degenValue: match[0] || '',
+          author: cast.author.fid || '',
+          timestamp: cast.timestamp
+        }
       }
-    }
-  })
-  .filter((value) => {
-    return value !== undefined
-  })
-  .map(async (value) => {
-    if (value) {
-      const response = await neynarClient.fetchBulkUsers([Number(value.author)])
+    })
+    .filter((value) => {
+      return value !== undefined
+    })
+    .map(async (value) => {
+      if (value) {
+        const response = await neynarClient.fetchBulkUsers([Number(value.author)])
 
-      const user = response.users.find((user) => {
-        return user.username
-      })
+        const user = response.users.find((user) => {
+          return user.username
+        })
 
-      const val: FCUser = {
-        username: user?.username || '',
-        degenValue: value?.degenValue,
-        timestamp: value?.timestamp
+        const val: FCUser = {
+          username: user?.username || '',
+          degenValue: value?.degenValue,
+          timestamp: value?.timestamp
+        }
+
+        return val
       }
+    })
+    .map(async (user) => {
+      const u: FCUser | undefined = await user
 
-      return val
-    }
-  })
-  .map(async (user) => {
-    const u: FCUser | undefined = await user
-    
-    return u
-  })
+      return u
+    })
 
   const requestUser = await Promise.all(filteredCasts)
 

@@ -1,3 +1,3 @@
-import { NeynarAPIClient } from "@neynar/nodejs-sdk";
+import { NeynarAPIClient } from '@neynar/nodejs-sdk'
 
-export const neynarClient = new NeynarAPIClient(process.env.NEYNAR_API_KEY || "");
+export const neynarClient = new NeynarAPIClient(process.env.NEYNAR_API_KEY || '')

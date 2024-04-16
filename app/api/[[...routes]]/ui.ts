@@ -1,5 +1,5 @@
 import { createSystem } from 'frog/ui'
- 
+
 export const {
   Box,
   Columns,
@@ -11,5 +11,5 @@ export const {
   Spacer,
   Text,
   VStack,
-  vars,
+  vars
 } = createSystem()
