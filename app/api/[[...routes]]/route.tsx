@@ -27,7 +27,7 @@ enum PageState {
 }
 
 const firstRun = async (fid: number, date: Date, forceRefresh: boolean) => {
-  const willRun = forceRefresh && process.env.CONFIG === "DEV"
+  const willRun = forceRefresh && process.env.CONFIG !== "DEV"
   const items = willRun ? await client(fid, date)
   .catch((e) => {
     console.error(`client items error: ${e}`)
@@ -240,8 +240,12 @@ app.frame('/check', async (c) => {
           width: '100%',
         }}
       >
-        <h1 style={{fontFamily: 'DM Serif Display', fontSize: 70, color: '#D6FFF6'}}>Sorry, your FID: {fid} is not eligible for S3 DEGEN tipping</h1> 
-        <p style={{fontSize: 45, color: '#D6FFF6'}}>Visit https://degen.tips for more info</p>        
+        <h1 style={{fontFamily: 'DM Serif Display', fontSize: '3rem', color: '#D6FFF6'}}>🎩 Who did I tip today? 🎩</h1>
+        <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+          <h1 style={{fontFamily: 'DM Serif Display', color: '#D6FFF6'}}>Sorry, your FID: {fid} is not eligible</h1> 
+          <h1 style={{fontFamily: 'DM Serif Display', color: '#D6FFF6', marginTop: -16}}>for S3 DEGEN tipping</h1> 
+        </div>
+        <h3 style={{ color: '#D6FFF6'}}>Visit https://degen.tips for more info</h3>        
       </div>
       )
     })
@@ -340,7 +344,7 @@ app.frame('/check', async (c) => {
           <h1 style={{fontFamily: 'Open Sans', fontWeight: 700, fontSize: 25, color: '#2CFA1F'}}>TOTAL: {`${totalDegen}`}/{allowance} $DEGEN - REMAINING: {`${Number(allowance) - totalDegen}`}</h1>
         }
         {frameData !== undefined && groupedArray.length === 0 && 
-          <div style={{display: 'flex', flexDirection: 'column', flex: 5, justifyContent: 'center', alignItems: 'center', alignContent: 'center'}}>
+          <div style={{display: 'flex', flexDirection: 'column', flex: 5, justifyContent: 'center', width: '50%', alignItems: 'center', alignContent: 'center'}}>
             <h2 style={{ color: '#D6FFF6', fontWeight: 400 }}>You haven't tipped today</h2>
             <h2 style={{ color: '#D6FFF6', fontWeight: 400 }}>Tips on casts in the following channels</h2>
             <h2 style={{ color: '#D6FFF6', fontWeight: 400, marginTop: -16 }}>receive a 1.5x boost: </h2>
