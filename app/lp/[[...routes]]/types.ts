@@ -1,5 +1,5 @@
 export interface HamUser {
-  username: string
-  hamValue?: string
-  timestamp: string
+	username: string;
+	hamValue?: string;
+	timestamp: string;
 }
