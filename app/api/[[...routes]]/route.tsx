@@ -76,12 +76,12 @@ const generateIntents = (pageState: PageState) => {
 				<Button.Link key={"boosted-channel"} href={updatedURL}>
 					Visit random boosted channel
 				</Button.Link>,
-				<Button.Link
-					key={"tip"}
-					href="https://warpcast.com/leovido.eth/0xd6e20741"
+				<Button.Redirect
+					key={"share"}
+					location="https://warpcast.com/~/compose?text=Check%20who%20you%20tipped%21%0A%0A&embeds[]=https%3A%2F%2Fdegen-me.leovido.xyz%2Fapi&embeds[]=https://warpcast.com/leovido.eth/0x7d10bcc0"
 				>
-					Tip 🎩
-				</Button.Link>
+					Share
+				</Button.Redirect>
 			];
 		}
 		case PageState.BEGINNING:
@@ -95,6 +95,12 @@ const generateIntents = (pageState: PageState) => {
 				>
 					Tip 🎩
 				</Button.Link>,
+				<Button.Redirect
+					key={"share"}
+					location="https://warpcast.com/~/compose?text=Check%20who%20you%20tipped%21%0A%0A&embeds[]=https%3A%2F%2Fdegen-me.leovido.xyz%2Fapi&embeds[]=https://warpcast.com/leovido.eth/0x7d10bcc0"
+				>
+					Share
+				</Button.Redirect>,
 				<Button key={"inc"} value="inc">
 					→
 				</Button>
@@ -104,12 +110,12 @@ const generateIntents = (pageState: PageState) => {
 				<Button key={"check"} action="/check" value="check">
 					Refresh
 				</Button>,
-				<Button.Link
-					key={"tip"}
-					href="https://warpcast.com/leovido.eth/0xd6e20741"
+				<Button.Redirect
+					key={"share"}
+					location="https://warpcast.com/~/compose?text=Check%20who%20you%20tipped%21%0A%0A&embeds[]=https%3A%2F%2Fdegen-me.leovido.xyz%2Fapi&embeds[]=https://warpcast.com/leovido.eth/0x7d10bcc0"
 				>
-					Tip 🎩
-				</Button.Link>,
+					Share
+				</Button.Redirect>,
 				<Button key={"dec"} value="dec">
 					←
 				</Button>,
@@ -128,9 +134,12 @@ const generateIntents = (pageState: PageState) => {
 				>
 					Tip 🎩
 				</Button.Link>,
-				<Button key={"dec"} value="dec">
-					←
-				</Button>,
+				<Button.Redirect
+					key={"share"}
+					location="https://warpcast.com/~/compose?text=Check%20who%20you%20tipped%21%0A%0A&embeds[]=https%3A%2F%2Fdegen-me.leovido.xyz%2Fapi&embeds[]=https://warpcast.com/leovido.eth/0x7d10bcc0"
+				>
+					Share
+				</Button.Redirect>,
 				<Button key={"pageOne"} value="pageOne">
 					Page 1
 				</Button>
@@ -225,7 +234,22 @@ app.frame("/", async (c) => {
 		intents: [
 			<Button key={"check"} action="/check" value="check">
 				Check
-			</Button>
+			</Button>,
+			<Button.Redirect
+				key={"share"}
+				location="https://warpcast.com/~/compose?text=Check%20who%20you%20tipped%21%0A%0A&embeds[]=https%3A%2F%2Fdegen-me.leovido.xyz%2Fapi&embeds[]=https://warpcast.com/leovido.eth/0x7d10bcc0"
+			>
+				Share
+			</Button.Redirect>,
+			<Button.Link
+				key={"tip"}
+				href="https://warpcast.com/leovido.eth/0x7d10bcc0"
+			>
+				Tip 🎩
+			</Button.Link>,
+			<Button.Link key={"degen-tips"} href="https://degen.tips">
+				Visit degen.tips
+			</Button.Link>
 		]
 	});
 });
