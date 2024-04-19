@@ -91,7 +91,7 @@ const generateIntents = (pageState: PageState) => {
 				</Button>,
 				<Button.Link
 					key={"tip"}
-					href="https://warpcast.com/leovido.eth/0xd6e20741"
+					href="https://warpcast.com/leovido.eth/0x7d10bcc0"
 				>
 					Tip 🎩
 				</Button.Link>,
@@ -130,7 +130,7 @@ const generateIntents = (pageState: PageState) => {
 				</Button>,
 				<Button.Link
 					key={"tip"}
-					href="https://warpcast.com/leovido.eth/0xd6e20741"
+					href="https://warpcast.com/leovido.eth/0x7d10bcc0"
 				>
 					Tip 🎩
 				</Button.Link>,
