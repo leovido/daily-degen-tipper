@@ -5,6 +5,7 @@ export interface FCUser {
 	username: string;
 	degenValue?: string;
 	timestamp: string;
+	fid: number;
 }
 
 export const client = async (fid: number, date: Date) => {
@@ -47,7 +48,8 @@ export const client = async (fid: number, date: Date) => {
 				const val: FCUser = {
 					username: user?.username || "",
 					degenValue: value?.degenValue,
-					timestamp: value?.timestamp
+					timestamp: value?.timestamp,
+					fid: user?.fid || 0
 				};
 
 				return val;

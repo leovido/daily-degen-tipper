@@ -9,6 +9,8 @@ import { vars } from "./ui";
 import { type FCUser, client } from "./client";
 import { type DegenResponse } from "./types";
 import { boostedChannels } from "./pill";
+import { mockItems } from "./mockFCUser";
+import { mockDegenResponse } from "./mockDegenResponse";
 
 interface State {
 	currentPage: number;
@@ -429,6 +431,19 @@ app.frame("/check", async (c) => {
 					🎩 Who did I tip today? 🎩
 				</h1>
 
+				{frameData !== undefined && groupedArray.length > 0 && (
+					<h1
+						style={{
+							fontFamily: "Open Sans",
+							fontWeight: 400,
+							fontSize: 25,
+							color: "#2CFA1F"
+						}}
+					>
+						Allowance: {allowance} - REMAINING:
+						{`${Number(allowance) - totalDegen}`}
+					</h1>
+				)}
 				{state.pages > 0 && <p style={{ color: "white" }}>{page}</p>}
 				{groupedArray.length > 0 && (
 					<div
@@ -451,7 +466,7 @@ app.frame("/check", async (c) => {
 									padding: 4,
 									paddingLeft: 8,
 									paddingRight: 8,
-									justifyContent: "space-around",
+									justifyContent: "space-between",
 									maxWidth: "100%"
 								}}
 							>
@@ -463,44 +478,22 @@ app.frame("/check", async (c) => {
 										fontWeight: 400
 									}}
 								>
-									{`${5 * state.currentPage + index + 1}. @${u?.username}`}
+									{`${5 * state.currentPage + index + 1}. @${u?.username} - ${u?.fid}`}
 								</h2>
 								<h2
 									key={index}
 									style={{
 										fontFamily: "AvenirNext",
 										color: "#D6FFF6",
-										fontWeight: 400
+										fontWeight: 400,
+										alignItems: "flex-end"
 									}}
 								>
 									{`${u?.degenValue}`}
 								</h2>
-								<h2
-									key={index}
-									style={{
-										fontFamily: "AvenirNext",
-										color: "#D6FFF6",
-										fontWeight: 400
-									}}
-								>
-									{`at ${u?.timestamp} UTC`}
-								</h2>
 							</div>
 						))}
 					</div>
-				)}
-				{frameData !== undefined && groupedArray.length > 0 && (
-					<h1
-						style={{
-							fontFamily: "Open Sans",
-							fontWeight: 700,
-							fontSize: 25,
-							color: "#2CFA1F"
-						}}
-					>
-						TOTAL: {`${totalDegen}`}/{allowance} $DEGEN - REMAINING:{" "}
-						{`${Number(allowance) - totalDegen}`}
-					</h1>
 				)}
 				{frameData !== undefined && groupedArray.length === 0 && (
 					<div

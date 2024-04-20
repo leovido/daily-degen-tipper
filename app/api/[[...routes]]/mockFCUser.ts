@@ -2,7 +2,38 @@ export const mockItems = [
 	{
 		username: "testwithaa",
 		degenValue: `${Math.floor(Math.random() * 10000).toFixed(0)} $DEGEN`,
-		timestamp: "09:00"
+		timestamp: "09:00",
+		fid: `${Math.floor(Math.random() * 10000).toFixed(0)}`
+	},
+	{
+		username: "test",
+		degenValue: `${Math.floor(Math.random() * 10000).toFixed(0)} $DEGEN`,
+		timestamp: "09:00",
+		fid: `${Math.floor(Math.random() * 10000).toFixed(0)}`
+	},
+	{
+		username: "test",
+		degenValue: `${Math.floor(Math.random() * 10000).toFixed(0)} $DEGEN`,
+		timestamp: "09:00",
+		fid: `${Math.floor(Math.random() * 10000).toFixed(0)}`
+	},
+	{
+		username: "test",
+		degenValue: `${Math.floor(Math.random() * 10000).toFixed(0)} $DEGEN`,
+		timestamp: "09:00",
+		fid: `${Math.floor(Math.random() * 10000).toFixed(0)}`
+	},
+	{
+		username: "test",
+		degenValue: `${Math.floor(Math.random() * 10000).toFixed(0)} $DEGEN`,
+		timestamp: "09:00",
+		fid: `${Math.floor(Math.random() * 10000).toFixed(0)}`
+	},
+	{
+		username: "test",
+		degenValue: `${Math.floor(Math.random() * 10000).toFixed(0)} $DEGEN`,
+		timestamp: "09:00",
+		fid: `${Math.floor(Math.random() * 10000).toFixed(0)}`
 	},
 	{
 		username: "test",
@@ -17,47 +48,26 @@ export const mockItems = [
 	{
 		username: "test",
 		degenValue: `${Math.floor(Math.random() * 10000).toFixed(0)} $DEGEN`,
-		timestamp: "09:00"
+		timestamp: "09:00",
+		fid: `${Math.floor(Math.random() * 10000).toFixed(0)}`
 	},
 	{
 		username: "test",
 		degenValue: `${Math.floor(Math.random() * 10000).toFixed(0)} $DEGEN`,
-		timestamp: "09:00"
+		timestamp: "09:00",
+		fid: `${Math.floor(Math.random() * 10000).toFixed(0)}`
 	},
 	{
 		username: "test",
 		degenValue: `${Math.floor(Math.random() * 10000).toFixed(0)} $DEGEN`,
-		timestamp: "09:00"
+		timestamp: "09:00",
+		fid: `${Math.floor(Math.random() * 10000).toFixed(0)}`
 	},
 	{
 		username: "test",
 		degenValue: `${Math.floor(Math.random() * 10000).toFixed(0)} $DEGEN`,
-		timestamp: "09:00"
-	},
-	{
-		username: "test",
-		degenValue: `${Math.floor(Math.random() * 10000).toFixed(0)} $DEGEN`,
-		timestamp: "09:00"
-	},
-	{
-		username: "test",
-		degenValue: `${Math.floor(Math.random() * 10000).toFixed(0)} $DEGEN`,
-		timestamp: "09:00"
-	},
-	{
-		username: "test",
-		degenValue: `${Math.floor(Math.random() * 10000).toFixed(0)} $DEGEN`,
-		timestamp: "09:00"
-	},
-	{
-		username: "test",
-		degenValue: `${Math.floor(Math.random() * 10000).toFixed(0)} $DEGEN`,
-		timestamp: "09:00"
-	},
-	{
-		username: "test",
-		degenValue: `${Math.floor(Math.random() * 10000).toFixed(0)} $DEGEN`,
-		timestamp: "09:00"
+		timestamp: "09:00",
+		fid: `${Math.floor(Math.random() * 10000).toFixed(0)}`
 	}
 ];
 
