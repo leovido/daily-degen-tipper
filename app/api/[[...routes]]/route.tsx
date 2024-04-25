@@ -78,7 +78,7 @@ const generateIntents = (pageState: PageState) => {
 				</Button.Link>,
 				<Button.Redirect
 					key={"share"}
-					location="https://warpcast.com/~/compose?text=Check%20who%20you%20tipped%21%0A%0A&embeds[]=https%3A%2F%2Fdegen-me.leovido.xyz%2Fapi&embeds[]=https://warpcast.com/leovido.eth/0x7d10bcc0"
+					location="https://warpcast.com/~/compose?text=Check%20who%20you%20tipped%21%0A%0A&embeds[]=https://warpcast.com/leovido.eth/0x7d10bcc0"
 				>
 					Share
 				</Button.Redirect>
@@ -97,7 +97,7 @@ const generateIntents = (pageState: PageState) => {
 				</Button.Link>,
 				<Button.Redirect
 					key={"share"}
-					location="https://warpcast.com/~/compose?text=Check%20who%20you%20tipped%21%0A%0A&embeds[]=https%3A%2F%2Fdegen-me.leovido.xyz%2Fapi&embeds[]=https://warpcast.com/leovido.eth/0x7d10bcc0"
+					location="https://warpcast.com/~/compose?text=Check%20who%20you%20tipped%21%0A%0A&embeds[]=https://warpcast.com/leovido.eth/0x7d10bcc0"
 				>
 					Share
 				</Button.Redirect>,
@@ -112,7 +112,7 @@ const generateIntents = (pageState: PageState) => {
 				</Button>,
 				<Button.Redirect
 					key={"share"}
-					location="https://warpcast.com/~/compose?text=Check%20who%20you%20tipped%21%0A%0A&embeds[]=https%3A%2F%2Fdegen-me.leovido.xyz%2Fapi&embeds[]=https://warpcast.com/leovido.eth/0x7d10bcc0"
+					location="https://warpcast.com/~/compose?text=Check%20who%20you%20tipped%21%0A%0A&embeds[]=https://warpcast.com/leovido.eth/0x7d10bcc0"
 				>
 					Share
 				</Button.Redirect>,
