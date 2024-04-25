@@ -4,7 +4,6 @@ import { castWithTimeFormatting, isWithinTimeRange } from "@/app/helper";
 export interface FCUser {
 	username: string;
 	degenValue?: string;
-	timestamp: string;
 	fid: number;
 }
 
@@ -21,14 +20,13 @@ export const client = async (fid: number, date: Date) => {
 		})
 		.map((cast) => castWithTimeFormatting(cast))
 		.map((cast) => {
-			const pattern = /\b\d+ \$DEGEN\b/;
+			const pattern = /(\b\d+) \$DEGEN\b/i;
 			const match = cast.text.match(pattern);
 
 			if (match !== null) {
 				return {
-					degenValue: match[0] || "",
-					author: cast.author.fid || "",
-					timestamp: cast.timestamp
+					degenValue: match[1] || "",
+					author: cast.author.fid || ""
 				};
 			}
 		})
@@ -48,7 +46,6 @@ export const client = async (fid: number, date: Date) => {
 				const val: FCUser = {
 					username: user?.username || "",
 					degenValue: value?.degenValue,
-					timestamp: value?.timestamp,
 					fid: user?.fid || 0
 				};
 

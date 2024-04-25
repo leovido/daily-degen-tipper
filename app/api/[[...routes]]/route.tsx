@@ -35,7 +35,7 @@ const firstRun = async (fid: number, date: Date, forceRefresh: boolean) => {
 
 				throw new Error(`client items error: ${e}`);
 			})
-		: [];
+		: mockItems;
 
 	const totalDegen = items.reduce((acc, item) => {
 		if (item) {
@@ -133,12 +133,22 @@ const app = new Frog<{ State: State }>({
 		items: [],
 		totalDegen: 0
 	},
-	imageAspectRatio: "1:1",
+	imageAspectRatio: "1.91:1",
 	assetsPath: "/",
 	basePath: "/api",
 	ui: { vars },
 	imageOptions: {
 		fonts: [
+			{
+				name: "Space Mono",
+				source: "google",
+				weight: 700
+			},
+			{
+				name: "Space Mono",
+				source: "google",
+				weight: 400
+			},
 			{
 				name: "Open Sans",
 				source: "google",
@@ -271,7 +281,7 @@ app.frame("/check", async (c) => {
 		});
 	}
 
-	const fid = frameData?.fid || 0;
+	const fid = 380136;
 
 	const request = await fetch(
 		`https://www.degen.tips/api/airdrop2/tip-allowance?fid=${fid}`,
@@ -293,7 +303,7 @@ app.frame("/check", async (c) => {
 
 				throw new Error(`degen.tips json: ${e}`);
 			})
-		: [];
+		: mockDegenResponse;
 
 	if (json.length === 0) {
 		return c.res({
@@ -430,31 +440,16 @@ app.frame("/check", async (c) => {
 				>
 					🎩 Who did I tip today? 🎩
 				</h1>
-
-				{frameData !== undefined && groupedArray.length > 0 && (
-					<h1
-						style={{
-							fontFamily: "Open Sans",
-							fontWeight: 400,
-							fontSize: 25,
-							color: "#2CFA1F"
-						}}
-					>
-						Allowance: {allowance} - REMAINING:
-						{`${Number(allowance) - totalDegen}`}
-					</h1>
-				)}
 				{state.pages > 0 && <p style={{ color: "white" }}>{page}</p>}
 				{groupedArray.length > 0 && (
 					<div
 						style={{
 							display: "flex",
 							flexDirection: "column",
-							width: "50%",
-							backgroundColor: "rgba(23, 16, 31, 0.75)",
-							borderRadius: 25,
-							borderWidth: 2,
-							borderColor: "#ffffff"
+							width: "50%"
+							// backgroundColor: "rgba(23, 16, 31, 0.75)"
+							// borderWidth: 2,
+							// borderColor: "#38BDF8"
 						}}
 					>
 						{groupedArray[state.currentPage].map((u, index) => (
@@ -463,36 +458,78 @@ app.frame("/check", async (c) => {
 								style={{
 									display: "flex",
 									flexDirection: "row",
-									padding: 4,
-									paddingLeft: 8,
-									paddingRight: 8,
+									paddingLeft: 16,
+									paddingRight: 16,
 									justifyContent: "space-between",
-									maxWidth: "100%"
+									maxWidth: "100%",
+									fontSize: 12,
+									color: "#38BDF8",
+									borderRadius: 4
+									// backgroundColor: index % 2 === 0 ? "#231651" : "#17101F"
 								}}
 							>
+								<div style={{ display: "flex", flexDirection: "column" }}>
+									<h2
+										key={index}
+										style={{
+											fontWeight: 400,
+											fontSize: 25,
+											fontFamily: "Open Sans"
+										}}
+									>
+										{`${5 * state.currentPage + index + 1}. @${u?.username}`}
+									</h2>
+									<h2
+										key={index}
+										style={{
+											color: "#D6FFF6",
+											fontWeight: 400,
+											marginTop: -20
+										}}
+									>
+										{`${u?.fid}`}
+									</h2>
+								</div>
 								<h2
 									key={index}
 									style={{
-										fontFamily: "AvenirNext",
-										color: "#D6FFF6",
-										fontWeight: 400
-									}}
-								>
-									{`${5 * state.currentPage + index + 1}. @${u?.username} - ${u?.fid}`}
-								</h2>
-								<h2
-									key={index}
-									style={{
-										fontFamily: "AvenirNext",
-										color: "#D6FFF6",
-										fontWeight: 400,
-										alignItems: "flex-end"
+										fontWeight: 700,
+										alignItems: "center",
+										fontSize: 35,
+										fontFamily: "Open Sans",
+										color: "#c7ffbf"
 									}}
 								>
 									{`${u?.degenValue}`}
 								</h2>
 							</div>
 						))}
+					</div>
+				)}
+				{frameData !== undefined && groupedArray.length > 0 && (
+					<div style={{ display: "flex" }}>
+						<h1
+							style={{
+								fontFamily: "Space Mono",
+								fontWeight: 400,
+								fontSize: 25,
+								color: "#2CFA1F",
+								textAlign: "right"
+							}}
+						>
+							Allowance: {allowance}
+						</h1>
+						<h1
+							style={{
+								fontFamily: "Space Mono",
+								fontWeight: 400,
+								fontSize: 25,
+								color: "#2CFA1F",
+								textAlign: "right"
+							}}
+						>
+							REMAINING: {`${Number(allowance) - totalDegen}`}
+						</h1>
 					</div>
 				)}
 				{frameData !== undefined && groupedArray.length === 0 && (
