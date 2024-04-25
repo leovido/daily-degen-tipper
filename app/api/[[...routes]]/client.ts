@@ -48,7 +48,7 @@ export const client = async (fid: number, date: Date) => {
 
 				const val: FCUser = {
 					username: user?.username || "",
-					degenValue: value?.degenValue,
+					degenValue: value?.degenValue || "",
 					fid: user?.fid || 0
 				};
 

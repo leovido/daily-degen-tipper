@@ -39,7 +39,7 @@ const firstRun = async (fid: number, date: Date, forceRefresh: boolean) => {
 
 	const totalDegen = items.reduce((acc, item) => {
 		if (item) {
-			const amount = (item.degenValue?.match(/\d+/) ?? [0])[0] ?? 0;
+			const amount = item.degenValue ?? 0;
 
 			return acc + Number(amount);
 		} else {
