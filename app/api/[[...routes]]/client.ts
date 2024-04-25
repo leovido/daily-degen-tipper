@@ -1,5 +1,6 @@
 import { neynarClient } from "@/app/client";
 import { castWithTimeFormatting, isWithinTimeRange } from "@/app/helper";
+import { kFormatter } from "@/app/numberFormattingKs";
 
 export interface FCUser {
 	username: string;
@@ -24,8 +25,10 @@ export const client = async (fid: number, date: Date) => {
 			const match = cast.text.match(pattern);
 
 			if (match !== null) {
+				const extractDegenString = match[1];
+				const formatted = kFormatter(extractDegenString);
 				return {
-					degenValue: match[1] || "",
+					degenValue: formatted || "",
 					author: cast.author.fid || ""
 				};
 			}
