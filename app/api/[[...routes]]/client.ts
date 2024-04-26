@@ -8,7 +8,10 @@ export interface FCUser {
 	fid: number;
 }
 
-export const client = async (fid: number, date: Date) => {
+export const client = async (
+	fid: number,
+	date: Date
+): Promise<(FCUser | undefined)[]> => {
 	if (process.env.CONFIG === "DEV") {
 		console.log("making a request...");
 	}

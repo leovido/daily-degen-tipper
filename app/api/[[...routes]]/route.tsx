@@ -29,7 +29,7 @@ enum PageState {
 
 const firstRun = async (fid: number, date: Date, forceRefresh: boolean) => {
 	const willRun = forceRefresh && process.env.CONFIG !== "DEV";
-	const items = willRun
+	const items: (FCUser | undefined)[] = willRun
 		? await client(fid, date).catch((e) => {
 				console.error(`client items error: ${e}`);
 
@@ -291,7 +291,7 @@ app.frame("/check", async (c) => {
 		});
 	}
 
-	const fid = 380136;
+	const fid = frameData?.fid || 0;
 
 	const request = await fetch(
 		`https://www.degen.tips/api/airdrop2/tip-allowance?fid=${fid}`,
