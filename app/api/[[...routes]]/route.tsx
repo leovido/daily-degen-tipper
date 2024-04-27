@@ -75,13 +75,7 @@ const generateIntents = (pageState: PageState) => {
 				</Button.Link>,
 				<Button.Link key={"boosted-channel"} href={updatedURL}>
 					Visit random boosted channel
-				</Button.Link>,
-				<Button.Redirect
-					key={"share"}
-					location="https://warpcast.com/~/compose?text=Check%20who%20you%20tipped%21%0A%0A&embeds[]=https://warpcast.com/leovido.eth/0x7d10bcc0"
-				>
-					Share
-				</Button.Redirect>
+				</Button.Link>
 			];
 		}
 		case PageState.BEGINNING:
@@ -95,12 +89,6 @@ const generateIntents = (pageState: PageState) => {
 				>
 					Tip 🎩
 				</Button.Link>,
-				<Button.Redirect
-					key={"share"}
-					location="https://warpcast.com/~/compose?text=Check%20who%20you%20tipped%21%0A%0A&embeds[]=https://warpcast.com/leovido.eth/0x7d10bcc0"
-				>
-					Share
-				</Button.Redirect>,
 				<Button key={"inc"} value="inc">
 					→
 				</Button>
@@ -110,12 +98,6 @@ const generateIntents = (pageState: PageState) => {
 				<Button key={"check"} action="/check" value="check">
 					Refresh
 				</Button>,
-				<Button.Redirect
-					key={"share"}
-					location="https://warpcast.com/~/compose?text=Check%20who%20you%20tipped%21%0A%0A&embeds[]=https://warpcast.com/leovido.eth/0x7d10bcc0"
-				>
-					Share
-				</Button.Redirect>,
 				<Button key={"dec"} value="dec">
 					←
 				</Button>,
@@ -134,12 +116,6 @@ const generateIntents = (pageState: PageState) => {
 				>
 					Tip 🎩
 				</Button.Link>,
-				<Button.Redirect
-					key={"share"}
-					location="https://warpcast.com/~/compose?text=Check%20who%20you%20tipped%21%0A%0A&embeds[]=https://warpcast.com/leovido.eth/0x7d10bcc0"
-				>
-					Share
-				</Button.Redirect>,
 				<Button key={"pageOne"} value="pageOne">
 					Page 1
 				</Button>
@@ -235,12 +211,6 @@ app.frame("/", async (c) => {
 			<Button key={"check"} action="/check" value="check">
 				Check
 			</Button>,
-			<Button.Redirect
-				key={"share"}
-				location="https://warpcast.com/~/compose?text=Check%20who%20you%20tipped%21%0A%0A&embeds[]=https://warpcast.com/leovido.eth/0x7d10bcc0"
-			>
-				Share
-			</Button.Redirect>,
 			<Button.Link
 				key={"tip"}
 				href="https://warpcast.com/leovido.eth/0x7d10bcc0"
