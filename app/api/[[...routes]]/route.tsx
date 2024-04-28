@@ -9,8 +9,6 @@ import { vars } from "./ui";
 import { type FCUser, client } from "./client";
 import { type DegenResponse } from "./types";
 import { boostedChannels } from "./pill";
-import { mockItems } from "./mockFCUser";
-import { mockDegenResponse } from "./mockDegenResponse";
 
 interface State {
 	currentPage: number;
@@ -35,7 +33,7 @@ const firstRun = async (fid: number, date: Date, forceRefresh: boolean) => {
 
 				throw new Error(`client items error: ${e}`);
 			})
-		: mockItems;
+		: [];
 
 	const totalDegen = items.reduce((acc, item) => {
 		if (item) {
@@ -139,16 +137,6 @@ const app = new Frog<{ State: State }>({
 	ui: { vars },
 	imageOptions: {
 		fonts: [
-			{
-				name: "Space Mono",
-				source: "google",
-				weight: 700
-			},
-			{
-				name: "Space Mono",
-				source: "google",
-				weight: 400
-			},
 			{
 				name: "Roboto",
 				source: "google",
@@ -313,7 +301,7 @@ app.frame("/check", async (c) => {
 
 				throw new Error(`degen.tips json: ${e}`);
 			})
-		: mockDegenResponse;
+		: [];
 
 	if (json.length === 0) {
 		return c.res({
@@ -451,144 +439,50 @@ app.frame("/check", async (c) => {
 					🎩 Who did I tip today? 🎩
 				</h1>
 				{state.pages > 0 && <p style={{ color: "white" }}>{page}</p>}
-				<div
-					style={{
-						display: "flex",
-						flexDirection: "row",
-						width: "50%"
-					}}
-				>
-					{groupedArray.length > 0 && (
-						<div
-							style={{
-								display: "flex",
-								flexDirection: "column",
-								width: "50%"
-								// backgroundColor: "rgba(23, 16, 31, 0.75)"
-								// borderWidth: 2,
-								// borderColor: "#38BDF8"
-							}}
-						>
-							{groupedArray[state.currentPage].slice(0, 5).map((u, index) => (
+
+				{groupedArray.length > 1 && (
+					<div
+						style={{
+							display: "flex",
+							flexDirection: "row",
+							justifyContent: "space-around",
+							width: "50%"
+						}}
+					>
+						{groupedArray[state.currentPage].length > 5 && (
+							<>
 								<div
-									key={"grouped-div"}
 									style={{
 										display: "flex",
-										flexDirection: "row",
-										paddingLeft: 16,
-										paddingRight: 16,
-										justifyContent: "space-between",
-										maxWidth: "100%",
-										fontSize: 12,
-										color: "#38BDF8",
-										borderRadius: 4
-										// backgroundColor: index % 2 === 0 ? "#231651" : "#17101F"
+										flexDirection: "column"
 									}}
 								>
-									<div style={{ display: "flex", flexDirection: "column" }}>
-										<h2
-											key={index}
-											style={{
-												fontWeight: 400,
-												fontSize: 25,
-												fontFamily: "Open Sans"
-											}}
-										>
-											{`${10 * state.currentPage + index + 1}. @${u?.username}`}
-										</h2>
-										<h2
-											key={index}
-											style={{
-												color: "#D6FFF6",
-												fontWeight: 400,
-												marginTop: -20
-											}}
-										>
-											{`${u?.fid}`}
-										</h2>
-									</div>
-									<h2
-										key={index}
-										style={{
-											fontWeight: 700,
-											alignItems: "center",
-											fontSize: 35,
-											fontFamily: "Roboto",
-											color: "#c7ffbf"
-										}}
-									>
-										{`${u?.degenValue}`}
-									</h2>
+									{singlePayslipView(groupedArray, false, false, state)}
 								</div>
-							))}
-						</div>
-					)}
-					{groupedArray.length > 0 && (
-						<div
-							style={{
-								display: "flex",
-								flexDirection: "column",
-								width: "50%"
-								// backgroundColor: "rgba(23, 16, 31, 0.75)"
-								// borderWidth: 2,
-								// borderColor: "#38BDF8"
-							}}
-						>
-							{groupedArray[state.currentPage].slice(5, 10).map((u, index) => (
 								<div
-									key={"grouped-div"}
 									style={{
 										display: "flex",
-										flexDirection: "row",
-										paddingLeft: 16,
-										paddingRight: 16,
-										justifyContent: "space-between",
-										maxWidth: "100%",
-										fontSize: 12,
-										color: "#38BDF8",
-										borderRadius: 4
-										// backgroundColor: index % 2 === 0 ? "#231651" : "#17101F"
+										flexDirection: "column"
 									}}
 								>
-									<div style={{ display: "flex", flexDirection: "column" }}>
-										<h2
-											key={index}
-											style={{
-												fontWeight: 400,
-												fontSize: 25,
-												fontFamily: "Open Sans"
-											}}
-										>
-											{`${10 * state.currentPage + index + 6}. @${u?.username}`}
-										</h2>
-										<h2
-											key={index}
-											style={{
-												color: "#D6FFF6",
-												fontWeight: 400,
-												marginTop: -20
-											}}
-										>
-											{`${u?.fid}`}
-										</h2>
-									</div>
-									<h2
-										key={index}
-										style={{
-											fontWeight: 700,
-											alignItems: "center",
-											fontSize: 35,
-											fontFamily: "Open Sans",
-											color: "#c7ffbf"
-										}}
-									>
-										{`${u?.degenValue}`}
-									</h2>
+									{singlePayslipView(groupedArray, false, true, state)}
 								</div>
-							))}
-						</div>
-					)}
-				</div>
+							</>
+						)}
+						{groupedArray[state.currentPage].length < 6 && (
+							<div
+								style={{
+									display: "flex",
+									flexDirection: "column"
+								}}
+							>
+								{singlePayslipView(groupedArray, true, false, state)}
+							</div>
+						)}
+					</div>
+				)}
+				{groupedArray.length < 2 &&
+					singlePayslipView(groupedArray, true, false, state)}
 				{frameData !== undefined && groupedArray.length > 0 && (
 					<div
 						style={{
@@ -704,3 +598,83 @@ devtools(app, { serveStatic });
 
 export const GET = handle(app);
 export const POST = handle(app);
+
+const singlePayslipView = (
+	groupedArray: (FCUser | undefined)[][],
+	isSingleView: boolean,
+	isSecondaryView: boolean,
+	state: State
+): React.ReactNode => {
+	const username = (username: string | undefined) => {
+		if (isSingleView) {
+			return username;
+		} else {
+			if (username && username.length > 9) {
+				return `${username?.slice(0, 8)}..`;
+			}
+			return username?.slice(0, 8) || "";
+		}
+	};
+	const range = isSecondaryView ? 5 : 0;
+	return (
+		<div
+			style={{
+				display: "flex",
+				flexDirection: "column",
+				width: isSingleView ? 500 : 320,
+				paddingLeft: 16,
+				paddingRight: 16
+			}}
+		>
+			{groupedArray[state.currentPage] &&
+				groupedArray[state.currentPage]
+					.slice(0 + range, 5 + range)
+					.map((u, index) => (
+						<div
+							key={`grouped-div-${index}`}
+							style={{
+								display: "flex",
+								flexDirection: "row",
+								justifyContent: "space-between",
+								fontSize: 12,
+								color: "#38BDF8"
+							}}
+						>
+							<div style={{ display: "flex", flexDirection: "column" }}>
+								<h2
+									key={index}
+									style={{
+										fontWeight: 400,
+										fontSize: 25,
+										fontFamily: "Open Sans"
+									}}
+								>{`${10 * state.currentPage + index + range + 1}. @${username(u?.username)}`}</h2>
+								<h2
+									key={index}
+									style={{
+										color: "#D6FFF6",
+										fontWeight: 400,
+										marginTop: -20
+									}}
+								>
+									{`${u?.fid}`}
+								</h2>
+							</div>
+							<h2
+								key={index}
+								style={{
+									fontWeight: 700,
+									alignItems: "center",
+									fontSize: 35,
+									fontFamily: "Roboto",
+									color: "#c7ffbf",
+									paddingLeft: 16
+								}}
+							>
+								{`${u?.degenValue}`}
+							</h2>
+						</div>
+					))}
+		</div>
+	);
+};
