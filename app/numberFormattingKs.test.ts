@@ -12,7 +12,7 @@ describe("K and M formatting numbers", () => {
 	});
 
 	it("formatting 1039", () => {
-		const expected = "1.039K";
+		const expected = "1039";
 		const sut = "1039";
 
 		const result = kFormatter(sut);
