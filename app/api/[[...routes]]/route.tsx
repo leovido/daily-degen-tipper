@@ -75,7 +75,8 @@ const generateIntents = (pageState: PageState) => {
 				</Button.Link>,
 				<Button.Link key={"boosted-channel"} href={updatedURL}>
 					Visit random boosted channel
-				</Button.Link>
+				</Button.Link>,
+				tipButton()
 			];
 		}
 		case PageState.BEGINNING:
@@ -83,12 +84,8 @@ const generateIntents = (pageState: PageState) => {
 				<Button key={"check"} action="/check" value="check">
 					Refresh
 				</Button>,
-				<Button.Link
-					key={"tip"}
-					href="https://warpcast.com/leovido.eth/0x7d10bcc0"
-				>
-					Tip 🎩
-				</Button.Link>,
+				shareButton(),
+				tipButton(),
 				<Button key={"inc"} value="inc">
 					→
 				</Button>
@@ -98,6 +95,7 @@ const generateIntents = (pageState: PageState) => {
 				<Button key={"check"} action="/check" value="check">
 					Refresh
 				</Button>,
+				tipButton(),
 				<Button key={"dec"} value="dec">
 					←
 				</Button>,
@@ -110,12 +108,8 @@ const generateIntents = (pageState: PageState) => {
 				<Button key={"check"} action="/check" value="check">
 					Refresh
 				</Button>,
-				<Button.Link
-					key={"tip"}
-					href="https://warpcast.com/leovido.eth/0x7d10bcc0"
-				>
-					Tip 🎩
-				</Button.Link>,
+				shareButton(),
+				tipButton(),
 				<Button key={"pageOne"} value="pageOne">
 					Page 1
 				</Button>
@@ -176,6 +170,25 @@ const app = new Frog<{ State: State }>({
 // Uncomment to use Edge Runtime
 // export const runtime = 'edge'
 
+const shareButton = () => {
+	return (
+		<Button.Redirect
+			key={"share"}
+			location="https://warpcast.com/~/compose?text=Check%20who%20you%20tipped%21%0A%0AFrame%20by%20@leovido.eth&embeds[]=https%3A%2F%2Fdegen-me.leovido.xyz%2Fapi"
+		>
+			Share
+		</Button.Redirect>
+	);
+};
+
+const tipButton = () => {
+	return (
+		<Button.Link key={"tip"} href="https://warpcast.com/leovido.eth/0x7d10bcc0">
+			Tip @leovido.eth
+		</Button.Link>
+	);
+};
+
 app.frame("/", async (c) => {
 	return c.res({
 		image: (
@@ -221,15 +234,8 @@ app.frame("/", async (c) => {
 			<Button key={"check"} action="/check" value="check">
 				Check
 			</Button>,
-			<Button.Link
-				key={"tip"}
-				href="https://warpcast.com/leovido.eth/0x7d10bcc0"
-			>
-				Tip 🎩
-			</Button.Link>,
-			<Button.Link key={"degen-tips"} href="https://degen.tips">
-				Visit degen.tips
-			</Button.Link>
+			// shareButton(),
+			tipButton()
 		]
 	});
 });
