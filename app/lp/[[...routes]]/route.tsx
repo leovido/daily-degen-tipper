@@ -525,8 +525,8 @@ const mappedView = (
 
 const tipButton = () => {
 	return (
-		<Button.Link key={"tip"} href="https://warpcast.com/leovido.eth/0x9812de51">
-			Tip @leovido.eth
+		<Button.Link key={"tip"} href="https://warpcast.com/leovido.eth/0x3dacd8c6">
+			Tip here
 		</Button.Link>
 	);
 };
