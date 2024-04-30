@@ -4,68 +4,68 @@ import { FCUser } from "./client";
 export const mockItems: FCUser[] = [
 	{
 		username: "nimaleophotos.eth",
-		degenValue: "100K",
+		tipAmount: "100K",
 
 		fid: 444444
 	},
 	{
 		username: "test",
-		degenValue: "100",
+		tipAmount: "100",
 
 		fid: Math.floor(Math.random() * 10000)
 	},
 	{
 		username: "test",
-		degenValue: `${kFormatter(Math.floor(Math.random() * 10000).toString())}`,
+		tipAmount: `${kFormatter(Math.floor(Math.random() * 10000).toString())}`,
 
 		fid: Math.floor(Math.random() * 10000)
 	},
 	{
 		username: "test",
-		degenValue: `${kFormatter(Math.floor(Math.random() * 10000).toString())}`,
+		tipAmount: `${kFormatter(Math.floor(Math.random() * 10000).toString())}`,
 
 		fid: Math.floor(Math.random() * 10000)
 	},
 	{
 		username: "test",
-		degenValue: `${kFormatter(Math.floor(Math.random() * 10000).toString())}`,
+		tipAmount: `${kFormatter(Math.floor(Math.random() * 10000).toString())}`,
 
 		fid: Math.floor(Math.random() * 10000)
 	},
 	{
 		username: "nimaleophotos.eth",
-		degenValue: `${kFormatter(Math.floor(Math.random() * 10000).toString())}`,
+		tipAmount: `${kFormatter(Math.floor(Math.random() * 10000).toString())}`,
 
 		fid: Math.floor(Math.random() * 10000)
 	},
 	{
 		username: "test",
-		degenValue: `${kFormatter(Math.floor(Math.random() * 10000).toString())}`,
+		tipAmount: `${kFormatter(Math.floor(Math.random() * 10000).toString())}`,
 		fid: Math.floor(Math.random() * 10000)
 	},
 	{
 		username: "test",
-		degenValue: `${kFormatter(Math.floor(Math.random() * 10000).toString())}`,
+		tipAmount: `${kFormatter(Math.floor(Math.random() * 10000).toString())}`,
 		fid: Math.floor(Math.random() * 10000)
 	},
 	{
 		username: "test",
-		degenValue: `${kFormatter(Math.floor(Math.random() * 10000).toString())}`,
+		tipAmount: `${kFormatter(Math.floor(Math.random() * 10000).toString())}`,
 		fid: Math.floor(Math.random() * 10000)
 	},
 	{
 		username: "test",
-		degenValue: `${kFormatter(Math.floor(Math.random() * 10000).toString())}`,
+		tipAmount: `${kFormatter(Math.floor(Math.random() * 10000).toString())}`,
 		fid: Math.floor(Math.random() * 10000)
 	},
 	{
 		username: "test",
-		degenValue: `${kFormatter(Math.floor(Math.random() * 10000).toString())}`,
+		tipAmount: `${kFormatter(Math.floor(Math.random() * 10000).toString())}`,
 		fid: Math.floor(Math.random() * 10000)
 	},
 	{
 		username: "nimaleophotos.eth",
-		degenValue: `${kFormatter(Math.floor(Math.random() * 10000).toString())}`,
+		tipAmount: `${kFormatter(Math.floor(Math.random() * 10000).toString())}`,
 		fid: Math.floor(Math.random() * 10000)
 	}
 ];
@@ -73,27 +73,27 @@ export const mockItems: FCUser[] = [
 export const mockItemsFiveItems = [
 	{
 		username: "test",
-		degenValue: `${Math.floor(Math.random() * 10000)}`,
+		tipAmount: `${Math.floor(Math.random() * 10000)}`,
 		fid: Math.floor(Math.random() * 10000)
 	},
 	{
 		username: "nimaleophotos.eth",
-		degenValue: `${Math.floor(Math.random() * 10000)}`,
+		tipAmount: `${Math.floor(Math.random() * 10000)}`,
 		fid: Math.floor(Math.random() * 10000)
 	},
 	{
 		username: "test",
-		degenValue: `${Math.floor(Math.random() * 10000)}`,
+		tipAmount: `${Math.floor(Math.random() * 10000)}`,
 		fid: Math.floor(Math.random() * 10000)
 	},
 	{
 		username: "test",
-		degenValue: `${Math.floor(Math.random() * 10000)}`,
+		tipAmount: `${Math.floor(Math.random() * 10000)}`,
 		fid: Math.floor(Math.random() * 10000)
 	},
 	{
 		username: "test",
-		degenValue: `${Math.floor(Math.random() * 10000)}`,
+		tipAmount: `${Math.floor(Math.random() * 10000)}`,
 		fid: Math.floor(Math.random() * 10000)
 	}
 ];

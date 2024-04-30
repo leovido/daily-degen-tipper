@@ -1,10 +1,10 @@
 import { neynarClient } from "@/app/client";
-import { castWithTimeFormatting, isWithinTimeRange } from "@/app/helper";
+import { isWithinTimeRange } from "@/app/helper";
 import { kFormatter } from "@/app/numberFormattingKs";
 
 export interface FCUser {
 	username: string;
-	degenValue?: string;
+	tipAmount?: string;
 	fid: number;
 }
 
@@ -22,7 +22,6 @@ export const client = async (
 		.filter((cast) => {
 			return isWithinTimeRange(date, cast.timestamp);
 		})
-		.map((cast) => castWithTimeFormatting(cast))
 		.map((cast) => {
 			const pattern = /(\b\d+) \$DEGEN\b/i;
 			const match = cast.text.match(pattern);
@@ -31,8 +30,8 @@ export const client = async (
 				const extractDegenString = match[1];
 				const formatted = kFormatter(extractDegenString);
 				return {
-					degenValue: formatted || "",
-					author: cast.author.fid || ""
+					tipAmount: formatted || "",
+					author: cast.parentAuthor.fid || ""
 				};
 			}
 		})
@@ -51,7 +50,7 @@ export const client = async (
 
 				const val: FCUser = {
 					username: user?.username || "",
-					degenValue: value?.degenValue || "",
+					tipAmount: value?.tipAmount || "",
 					fid: user?.fid || 0
 				};
 

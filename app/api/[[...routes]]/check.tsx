@@ -108,7 +108,7 @@
 
 //   const totalDegen = items.reduce((acc, item) => {
 //     if (item) {
-//       const amount = (item.degenValue?.match(/\d+/) ?? [0])[0] ?? 0;
+//       const amount = (item.tipAmount?.match(/\d+/) ?? [0])[0] ?? 0;
 
 //       return acc + Number(amount)
 //     } else {
@@ -156,7 +156,7 @@
 //                   {`${(5 * state.count) + index + 1}. @${u?.username}`}
 //                 </h2>
 //               <h2 key={index} style={{ fontFamily: "AvenirNext", color: '#D6FFF6', fontWeight: 400}}>
-//                 {`${u?.degenValue}`}
+//                 {`${u?.tipAmount}`}
 //               </h2>
 //               <h2 key={index} style={{ fontFamily: "AvenirNext", color: '#D6FFF6', fontWeight: 400}}>
 //                 {`at ${u?.timestamp} UTC`}

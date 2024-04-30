@@ -1,12 +1,8 @@
-import {
-	type CastParentAuthorAllOf,
-	type CastWithInteractions
-} from "@neynar/nodejs-sdk/build/neynar-api/v1";
+import { type CastParentAuthorAllOf } from "@neynar/nodejs-sdk/build/neynar-api/v1";
 
 export interface CastWithTimestamp {
 	author: CastParentAuthorAllOf;
 	text: string;
-	timestamp: string;
 }
 
 export const isWithinTimeRange = (
@@ -128,20 +124,4 @@ export const calculateHamAmount = (text: string) => {
 			}
 		}
 	}
-};
-
-export const castWithTimeFormatting = (
-	cast: CastWithInteractions
-): CastWithTimestamp => {
-	const castDate = new Date(cast.timestamp);
-	const hours = castDate.getUTCHours();
-	const minutes = castDate.getUTCMinutes();
-
-	const formattedTime = `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
-
-	return {
-		author: cast.parentAuthor,
-		text: cast.text,
-		timestamp: `${formattedTime}`
-	};
 };

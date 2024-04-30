@@ -37,7 +37,7 @@ const firstRun = async (fid: number, date: Date, forceRefresh: boolean) => {
 
 	const totalDegen = items.reduce((acc, item) => {
 		if (item) {
-			const amount = item.degenValue ?? 0;
+			const amount = item.tipAmount ?? 0;
 
 			return acc + Number(amount);
 		} else {
@@ -677,7 +677,7 @@ const singlePayslipView = (
 									paddingLeft: 16
 								}}
 							>
-								{`${u?.degenValue}`}
+								{`${u?.tipAmount}`}
 							</h2>
 						</div>
 					))}

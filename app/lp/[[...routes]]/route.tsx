@@ -6,28 +6,67 @@ import { devtools } from "frog/dev";
 import { handle } from "frog/next";
 import { serveStatic } from "frog/serve-static";
 import { vars } from "../../api/[[...routes]]/ui";
-import { client } from "./neynarClient";
+import { client, fetchUserInfo } from "./neynarClient";
+import { FCUser } from "@/app/api/[[...routes]]/client";
+import { Image } from "../../api/[[...routes]]/ui";
 
 interface State {
-	count: number;
+	currentPage: number;
+	pages: number;
+	pageState: PageState;
+	items: Array<Array<FCUser | undefined>>;
 }
+
+enum PageState {
+	EMPTY,
+	BEGINNING,
+	MIDDLE,
+	END
+}
+
+const backgroundColor = "#F5F5DC";
+const foregroundColor = "#8E021f";
+const bodyColor = "#6B4E31";
+const footerColor = "#593E23";
 
 const app = new Frog<{ State: State }>({
 	initialState: {
-		count: 0
+		currentPage: 0
 	},
+	imageAspectRatio: "1:1",
 	assetsPath: "/",
 	basePath: "/lp",
 	ui: { vars },
 	imageOptions: {
 		fonts: [
 			{
-				name: "VT323",
-				source: "google"
+				name: "Montserrat",
+				source: "google",
+				weight: 400
+			},
+			{
+				name: "Roboto Slab",
+				source: "google",
+				weight: 400
+			},
+			{
+				name: "Montserrat",
+				source: "google",
+				weight: 700
 			},
 			{
 				name: "Open Sans",
 				source: "google"
+			},
+			{
+				name: "Lato",
+				source: "google",
+				weight: 400
+			},
+			{
+				name: "Lato",
+				source: "google",
+				weight: 700
 			}
 		]
 	},
@@ -45,7 +84,8 @@ const app = new Frog<{ State: State }>({
 // export const runtime = 'edge'
 
 app.frame("/check", async (c) => {
-	const { buttonIndex, buttonValue, frameData, deriveState, verified } = c;
+	const { buttonValue, frameData, deriveState, verified } = c;
+	const forceRefresh = buttonValue === "check";
 
 	const fid = frameData?.fid || 0;
 
@@ -58,7 +98,7 @@ app.frame("/check", async (c) => {
 					style={{
 						fontFamily: "Open Sans",
 						alignItems: "center",
-						background: "linear-gradient(to right, #231651, #17101F)",
+						backgroundColor,
 						backgroundSize: "100% 100%",
 						display: "flex",
 						flexDirection: "column",
@@ -74,7 +114,7 @@ app.frame("/check", async (c) => {
 							fontFamily: "Open Sans",
 							fontWeight: 700,
 							fontSize: 45,
-							color: "#D6FFF6"
+							color: foregroundColor
 						}}
 					>
 						Something went wrong
@@ -88,11 +128,6 @@ app.frame("/check", async (c) => {
 			]
 		});
 	}
-
-	const state = deriveState((previousState) => {
-		if (buttonIndex === 2 && buttonValue !== "check") previousState.count++;
-		if (buttonIndex === 1 && buttonValue !== "check") previousState.count--;
-	});
 
 	const fetchAllowance = await fetch(
 		`https://farcaster.dep.dev/lp/tips/${fid}`,
@@ -108,7 +143,7 @@ app.frame("/check", async (c) => {
 		throw new Error(`fetchAllowance: ${e}`);
 	});
 
-	const { allowance: allowanceResponse } = await fetchAllowance
+	const { allowance: allowanceResponse, used } = await fetchAllowance
 		.json()
 		.catch((e) => {
 			console.error(`fetchAllowance: ${e}`);
@@ -121,9 +156,9 @@ app.frame("/check", async (c) => {
 			image: (
 				<div
 					style={{
-						fontFamily: "VT323",
+						fontFamily: "Roboto Slab",
 						alignItems: "center",
-						background: "linear-gradient(to right, #000000, #0049f7)",
+						backgroundColor,
 						backgroundSize: "100% 100%",
 						display: "flex",
 						flexDirection: "column",
@@ -138,19 +173,19 @@ app.frame("/check", async (c) => {
 						style={{
 							fontFamily: "DM Serif Display",
 							fontSize: 70,
-							color: "#D6FFF6"
+							color: foregroundColor
 						}}
 					>
 						Sorry, your FID: {fid} is not eligible for ham tipping
 					</h1>
-					<p style={{ fontSize: 45, color: "#D6FFF6" }}>
+					<p style={{ fontSize: 45, color: foregroundColor }}>
 						Visit https://based.thelp.xyz for more info
 					</p>
 				</div>
 			),
 			intents: [
 				<Button.Link key={"visit-lp"} href="https://based.thelp.xyz">
-					Visit website
+					website
 				</Button.Link>
 			]
 		});
@@ -158,127 +193,201 @@ app.frame("/check", async (c) => {
 
 	const date = new Date();
 
-	const items = await client(fid, date).catch((e) => {
-		console.error(`client items: ${e}`);
+	const { pfpURL, username } = await fetchUserInfo(fid);
+	const { groupedArray: grouped } = await firstRun(fid, date, forceRefresh);
 
-		throw new Error(`client items: ${e}`);
+	const state = deriveState((previousState) => {
+		switch (buttonValue) {
+			case "dec":
+				previousState.currentPage = Math.max(0, previousState.currentPage - 1);
+				break;
+			case "inc":
+				previousState.currentPage = Math.min(
+					previousState.pages - 1,
+					previousState.currentPage + 1
+				);
+				break;
+			case "pageOne":
+				previousState.currentPage = 0;
+				previousState.pageState = PageState.BEGINNING;
+				break;
+			case "refresh":
+			case "check":
+				previousState.pages = grouped.length;
+				previousState.items = grouped;
+				break;
+			default:
+				break;
+		}
+
+		if (previousState.pages === 1) {
+			previousState.pageState = PageState.EMPTY;
+		} else if (previousState.currentPage === 0) {
+			previousState.pageState = PageState.BEGINNING;
+		} else if (previousState.currentPage === previousState.pages - 1) {
+			previousState.pageState = PageState.END;
+		} else if (
+			previousState.currentPage > 0 &&
+			previousState.currentPage < previousState.pages - 1
+		) {
+			previousState.pageState = PageState.MIDDLE;
+		}
 	});
 
-	const totalHam = items.reduce((acc, item) => {
-		if (item) {
-			const amount = (item.hamValue?.match(/\d+/) ?? [0])[0] ?? 0;
-
-			return acc + Number(amount) * 10;
-		} else {
-			return acc + 0;
-		}
-	}, 0);
-
+	const page = `${state.currentPage + 1}/${state.pages}`;
 	const allowance = Math.trunc(allowanceResponse);
-	const remainingHam = allowance - totalHam;
-
-	const groupedArray = Array.from(
-		{ length: Math.ceil(items.length / 5) },
-		(_, index) => items.slice(index * 5, index * 5 + 5)
-	);
+	const groupedArray = forceRefresh ? grouped : state.items;
+	const remainingHam = allowance - used;
 
 	return c.res({
 		image: (
 			<div
 				style={{
-					fontFamily: "VT323",
+					fontFamily: "Roboto Slab",
+					fontWeight: 700,
 					alignItems: "center",
-					background: "linear-gradient(to right, #000000, #0049f7)",
+					background: `linear-gradient(to bottom, #FEBE81, ${backgroundColor})`,
 					backgroundSize: "100% 100%",
 					display: "flex",
 					flexDirection: "column",
+					justifyContent: "space-around",
 					flexWrap: "nowrap",
 					height: "100%",
-					justifyContent: "center",
 					textAlign: "center",
 					width: "100%"
 				}}
 			>
-				<h1 style={{ fontSize: 85, color: "#D6FFF6" }}>Who did I tip today?</h1>
-
 				<div
 					style={{
 						display: "flex",
-						flexDirection: "column",
+						flexDirection: "row",
 						alignItems: "center"
 					}}
 				>
-					{groupedArray.length > 0 &&
-						groupedArray[state.count].map((u, index) => (
-							<div
-								key={"grouped-div"}
-								style={{
-									display: "flex",
-									flexDirection: "column",
-									alignItems: "center"
-								}}
-							>
-								<p
-									key={index}
+					<Image
+						borderRadius={"20"}
+						src={pfpURL}
+						width={"40"}
+						height={"40"}
+					></Image>
+					<h1
+						style={{
+							fontSize: 55,
+							color: foregroundColor,
+							padding: 8
+						}}
+					>
+						@{username}
+					</h1>
+				</div>
+
+				{state.pages > 0 && <p style={{ color: "black" }}>{page}</p>}
+
+				{groupedArray.length > 1 && (
+					<div
+						style={{
+							display: "flex",
+							flexDirection: "row",
+							justifyContent: "space-around",
+							width: "50%"
+						}}
+					>
+						{groupedArray[state.currentPage].length > 5 && (
+							<>
+								<div
 									style={{
-										fontFamily: "Open Sans",
-										fontSize: 35,
-										color: "#D6FFF6"
+										display: "flex",
+										flexDirection: "column"
 									}}
 								>
-									{`${5 * state.count + index + 1}. @${u?.username} - ${u?.hamValue} at ${u?.timestamp} UTC`}
-								</p>
+									{singlePayslipView(
+										groupedArray,
+										false,
+										false,
+										state.currentPage
+									)}
+								</div>
+								<div
+									style={{
+										display: "flex",
+										flexDirection: "column"
+									}}
+								>
+									{singlePayslipView(
+										groupedArray,
+										false,
+										true,
+										state.currentPage
+									)}
+								</div>
+							</>
+						)}
+						{groupedArray[state.currentPage].length < 6 && (
+							<div
+								style={{
+									display: "flex",
+									flexDirection: "column"
+								}}
+							>
+								{singlePayslipView(
+									groupedArray,
+									true,
+									false,
+									state.currentPage
+								)}
 							</div>
-						))}
-					{groupedArray.length > 0 && (
-						<p style={{ fontSize: 55, color: "#2CFA1F" }}>
-							TOTAL🍖: {`${totalHam}`}/{allowance} - REMAINING:{" "}
-							{`${remainingHam}`}
-						</p>
-					)}
-					{groupedArray.length === 0 && (
-						<div
+						)}
+					</div>
+				)}
+				{groupedArray.length < 2 &&
+					singlePayslipView(groupedArray, true, false, state.currentPage)}
+
+				{frameData !== undefined && groupedArray.length > 0 && (
+					<div
+						style={{
+							display: "flex",
+							flexDirection: "column",
+							alignItems: "center"
+						}}
+					>
+						<p
 							style={{
-								display: "flex",
-								flexDirection: "column",
-								alignItems: "center"
+								fontSize: "1.8rem",
+								color: footerColor,
+								fontFamily: "Lato"
 							}}
 						>
-							<p style={{ fontSize: 45, color: "#D6FFF6" }}>
-								You haven&apos;t tipped 🍖 today
-							</p>
-							<p style={{ fontSize: 45, color: "#D6FFF6" }}>
-								Tip artists, musicians, devs, leaders, etc.
-							</p>
-							<p style={{ fontSize: 45, color: "#2CFA1F", fontWeight: 700 }}>
-								Your allowance: {allowance} 🍖
-							</p>
-						</div>
-					)}
-				</div>
+							TOTAL🍖: {allowance} - REMAINING: {`${remainingHam}`}
+						</p>
+					</div>
+				)}
+				{frameData !== undefined && groupedArray.length === 0 && (
+					<div
+						style={{
+							display: "flex",
+							flexDirection: "column",
+							alignItems: "center",
+							fontFamily: "Montserrat"
+						}}
+					>
+						<p style={{ fontSize: 25, color: foregroundColor }}>
+							You haven&apos;t tipped 🍖 today
+						</p>
+						<p
+							style={{
+								fontSize: 25,
+								fontWeight: 700,
+								color: "#E2725B",
+								fontFamily: "Roboto Slab"
+							}}
+						>
+							Your allowance: {allowance} 🍖
+						</p>
+					</div>
+				)}
 			</div>
 		),
-		intents: [
-			frameData !== undefined && groupedArray.length > 1 && (
-				<Button value="dec">←</Button>
-			),
-			frameData !== undefined && groupedArray.length > 1 && (
-				<Button value="inc">→</Button>
-			),
-			frameData !== undefined && groupedArray.length <= 1 && (
-				<Button action="/check" value="check">
-					Refresh
-				</Button>
-			),
-			frameData !== undefined && groupedArray.length <= 1 && (
-				<Button.Link href="https://warpcast.com/deployer/0x388a831b">
-					L3 🍖 news
-				</Button.Link>
-			),
-			frameData !== undefined && (
-				<Button.Link href="https://ham.fun">Visit ham.fun</Button.Link>
-			)
-		]
+		intents: generateIntents(state.pageState)
 	});
 });
 
@@ -287,9 +396,8 @@ app.frame("/", async (c) => {
 		image: (
 			<div
 				style={{
-					fontFamily: "VT323",
+					fontFamily: "Roboto Slab",
 					alignItems: "center",
-					background: "linear-gradient(to right, #000000, #0049f7)",
 					backgroundSize: "100% 100%",
 					display: "flex",
 					flexDirection: "column",
@@ -300,17 +408,18 @@ app.frame("/", async (c) => {
 					width: "100%"
 				}}
 			>
-				<h1 style={{ fontSize: 85, color: "#D6FFF6" }}>Who did I tip today?</h1>
-				<h1 style={{ fontSize: 55, color: "#D6FFF6" }}>🍖 LP Ham edition 🍖</h1>
-				<h4 style={{ fontFamily: "Open Sans", fontSize: 35, color: "#D6FFF6" }}>
-					by @leovido.eth
-				</h4>
+				<Image height={"100%"} src="/ham-frame.png"></Image>
 			</div>
 		),
 		intents: [
 			<Button key={"check"} action="/check" value="check">
 				Check
-			</Button>
+			</Button>,
+			// shareButton(),
+			tipButton(),
+			<Button.Link key={"ham-fun"} href="https://ham.fun">
+				ham.fun
+			</Button.Link>
 		]
 	});
 });
@@ -319,3 +428,204 @@ devtools(app, { serveStatic });
 
 export const GET = handle(app);
 export const POST = handle(app);
+
+const singlePayslipView = (
+	groupedArray: (FCUser | undefined)[][],
+	isSingleView: boolean,
+	isSecondaryView: boolean,
+	page: number
+): React.ReactNode => {
+	const username = (username: string | undefined) => {
+		if (isSingleView) {
+			return username || "";
+		} else {
+			if (username && username.length > 9) {
+				return `${username.slice(0, 8)}..`;
+			}
+			return username?.slice(0, 8) || "";
+		}
+	};
+	const range = isSecondaryView ? 5 : 0;
+
+	return (
+		<div
+			style={{
+				display: "flex",
+				flexDirection: "column",
+				width: isSingleView ? 500 : 320,
+				paddingLeft: 16,
+				paddingRight: 16
+			}}
+		>
+			{groupedArray[page] && mappedView(groupedArray, page, range, username)}
+		</div>
+	);
+};
+
+const mappedView = (
+	groupedArray: (FCUser | undefined)[][],
+	page: number,
+	range: number,
+	username: (username: string | undefined) => string
+) => {
+	const pageArray = groupedArray[page];
+	const value = pageArray
+		? pageArray.slice(0 + range, 5 + range).filter((x) => x !== undefined)
+		: [];
+
+	return value.map((u, index) => (
+		<div
+			key={`grouped-div-${index}`}
+			style={{
+				display: "flex",
+				flexDirection: "row",
+				justifyContent: "space-between",
+				fontSize: 12,
+				color: "#38BDF8"
+			}}
+		>
+			<div style={{ display: "flex", flexDirection: "column" }}>
+				<h2
+					key={index}
+					style={{
+						fontWeight: 400,
+						fontSize: 25,
+						fontFamily: "Lato",
+						color: bodyColor
+					}}
+				>{`${10 * page + index + range + 1}. @${username(u?.username)}`}</h2>
+				<h2
+					key={index}
+					style={{
+						color: "rgb(0,0,0, 0.7)",
+						fontWeight: 200,
+						marginTop: -20,
+						fontFamily: "Lato"
+					}}
+				>
+					{`${u?.fid}`}
+				</h2>
+			</div>
+			<h2
+				key={index}
+				style={{
+					fontWeight: 700,
+					alignItems: "center",
+					fontSize: 35,
+					fontFamily: "Lato",
+					color: bodyColor,
+					paddingLeft: 16
+				}}
+			>
+				{`${u?.tipAmount}`}
+			</h2>
+		</div>
+	));
+};
+
+const tipButton = () => {
+	return (
+		<Button.Link key={"tip"} href="https://warpcast.com/leovido.eth/0x9812de51">
+			Tip @leovido.eth
+		</Button.Link>
+	);
+};
+
+const firstRun = async (fid: number, date: Date, forceRefresh: boolean) => {
+	const willRun = forceRefresh && process.env.CONFIG !== "DEV";
+	const items: (FCUser | undefined)[] = willRun
+		? await client(fid, date).catch((e) => {
+				console.error(`client items error: ${e}`);
+
+				throw new Error(`client items error: ${e}`);
+			})
+		: [];
+
+	const totalHam = items.reduce((acc, item) => {
+		if (item) {
+			const amount = item.tipAmount ?? 0;
+
+			return acc + Number(amount);
+		} else {
+			return acc + 0;
+		}
+	}, 0);
+
+	const groupedArray = Array.from(
+		{ length: Math.ceil(items.length / 10) },
+		(_, index) => items.slice(index * 10, index * 10 + 10)
+	);
+
+	return {
+		totalHam,
+		groupedArray
+	};
+};
+
+const generateIntents = (pageState: PageState) => {
+	switch (pageState) {
+		case PageState.EMPTY: {
+			return [
+				<Button key={"check"} action="/check" value="check">
+					Refresh
+				</Button>,
+				<Button.Link key={"ham-fun"} href="https://ham.fun">
+					ham.fun
+				</Button.Link>,
+				<Button.Link
+					key={"l3-news"}
+					href="https://warpcast.com/deployer/0x388a831b"
+				>
+					L3 🍖 news
+				</Button.Link>,
+				tipButton()
+			];
+		}
+		case PageState.BEGINNING:
+			return [
+				<Button key={"check"} action="/check" value="check">
+					Refresh
+				</Button>,
+				shareButton(),
+				tipButton(),
+				<Button key={"inc"} value="inc">
+					→
+				</Button>
+			];
+		case PageState.MIDDLE:
+			return [
+				<Button key={"check"} action="/check" value="check">
+					Refresh
+				</Button>,
+				tipButton(),
+				<Button key={"dec"} value="dec">
+					←
+				</Button>,
+				<Button key={"inc"} value="inc">
+					→
+				</Button>
+			];
+		case PageState.END:
+			return [
+				<Button key={"check"} action="/check" value="check">
+					Refresh
+				</Button>,
+				shareButton(),
+				tipButton(),
+				<Button key={"pageOne"} value="pageOne">
+					Page 1
+				</Button>
+			];
+	}
+};
+
+const shareButton = () => {
+	return (
+		<Button.Redirect
+			key={"share"}
+			location="https://warpcast.com/~/compose?text=Check%20who%20you%20ham%20tipped%21%0A%0AFrame%20by%20@leovido.eth&embeds[]=https%3A%2F%2Fham-me.leovido.xyz%2Flp"
+		>
+			Share
+		</Button.Redirect>
+	);
+};

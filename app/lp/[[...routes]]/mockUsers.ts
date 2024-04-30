@@ -1,65 +1,75 @@
 export const mockHamItems = [
 	{
 		username: "test",
-		hamValue: "🍖",
-		timestamp: "234"
+		tipAmount: "🍖",
+		fid: Math.floor(Math.random() * 10000)
 	},
 	{
 		username: "test",
-		hamValue: "🍖🍖🍖🍖🍖",
-		timestamp: "234"
+		tipAmount: "🍖🍖🍖🍖🍖",
+		fid: Math.floor(Math.random() * 10000)
 	},
 	{
 		username: "test",
-		hamValue: "🍖 x 200",
-		timestamp: "234"
+		tipAmount: "🍖 x 200",
+		fid: Math.floor(Math.random() * 10000)
 	},
 	{
 		username: "test",
-		hamValue: "🍖x2",
-		timestamp: "234"
+		tipAmount: "🍖x2",
+		fid: Math.floor(Math.random() * 10000)
 	},
 	{
 		username: "test",
-		hamValue: "🍖 x 42",
-		timestamp: "234"
+		tipAmount: "🍖 x 42",
+		fid: Math.floor(Math.random() * 10000)
 	},
 	{
 		username: "test",
-		hamValue: "🍖🍖 x 20",
-		timestamp: "234"
+		tipAmount: "🍖🍖 x 20",
+		fid: Math.floor(Math.random() * 10000)
+	},
+	{
+		username: "test",
+		tipAmount: "🍖🍖 x 20",
+		fid: Math.floor(Math.random() * 10000)
+	},
+	{
+		username: "test",
+		tipAmount: "🍖🍖 x 20",
+		fid: Math.floor(Math.random() * 10000)
 	}
 ];
 
 export const mockHamWithAmount = [
 	{
 		username: "test",
-		hamValue: "20",
-		timestamp: "234"
+		tipAmount: "20",
+		fid: 342333
 	},
 	{
 		username: "test",
-		hamValue: "10",
-		timestamp: "234"
+		tipAmount: "10",
+		fid: 342333
 	},
 	{
 		username: "test",
-		hamValue: "20000",
-		timestamp: "234"
+		tipAmount: "20000",
+		fid: 342333
 	},
 	{
 		username: "test",
-		hamValue: "384",
-		timestamp: "234"
+		tipAmount: "384",
+		fid: 342333
 	},
 	{
 		username: "test",
-		hamValue: "42",
-		timestamp: "234"
+		tipAmount: "42",
+		fid: 342333
 	},
 	{
 		username: "test",
-		hamValue: "1",
-		timestamp: "234"
+		tipAmount: "1",
+		fid: 342333
 	}
 ];
