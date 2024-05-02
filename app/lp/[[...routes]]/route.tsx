@@ -14,11 +14,13 @@ interface State {
 	currentPage: number;
 	pages: number;
 	pageState: PageState;
+	isSearchMode: boolean;
 	items: Array<Array<FCUser | undefined>>;
 }
 
 const initialState = {
-	currentPage: 0
+	currentPage: 0,
+	isSearchMode: false
 };
 
 enum PageState {
@@ -89,7 +91,8 @@ app.frame("/check", async (c) => {
 	const { buttonValue, frameData, deriveState, verified, inputText } = c;
 	const forceRefresh = buttonValue === "myTips" || buttonValue === "check";
 
-	const searchFID = inputText ? Number(inputText) : 0;
+	const searchFID =
+		inputText && buttonValue === "check" ? Number(inputText) : 0;
 	const currentFID = frameData?.fid || 0;
 	const fid = searchFID > 0 ? searchFID : currentFID;
 
@@ -224,6 +227,11 @@ app.frame("/check", async (c) => {
 	const { groupedArray: grouped } = await firstRun(fid, date, forceRefresh);
 
 	const state = deriveState((previousState) => {
+		if (searchFID !== 0) {
+			previousState.isSearchMode = true;
+		} else {
+			previousState.isSearchMode = false;
+		}
 		switch (buttonValue) {
 			case "dec":
 				previousState.currentPage = Math.max(0, previousState.currentPage - 1);
@@ -402,7 +410,7 @@ app.frame("/check", async (c) => {
 							style={{
 								fontSize: 25,
 								fontWeight: 700,
-								color: "#E2725B",
+								color: foregroundColor,
 								fontFamily: "Roboto Slab"
 							}}
 						>
@@ -412,7 +420,7 @@ app.frame("/check", async (c) => {
 				)}
 			</div>
 		),
-		intents: generateIntents(state.pageState, inputText)
+		intents: generateIntents(state.pageState, state.isSearchMode)
 	});
 });
 
@@ -603,14 +611,11 @@ const textInput = () => {
 	);
 };
 
-const generateIntents = (
-	pageState: PageState,
-	inputText: string | undefined
-) => {
+const generateIntents = (pageState: PageState, isSearchMode: boolean) => {
 	switch (pageState) {
 		case PageState.EMPTY: {
 			return [
-				inputText ? (
+				isSearchMode ? (
 					<Button key={"restart"} action="/" value="restart">
 						Restart
 					</Button>
@@ -633,9 +638,15 @@ const generateIntents = (
 		}
 		case PageState.BEGINNING:
 			return [
-				<Button key={"check"} action="/check" value="check">
-					Refresh
-				</Button>,
+				isSearchMode ? (
+					<Button key={"restart"} action="/" value="restart">
+						Restart
+					</Button>
+				) : (
+					<Button key={"check"} action="/check" value="check">
+						Refresh
+					</Button>
+				),
 				shareButton(),
 				tipButton(),
 				<Button key={"inc"} value="inc">
@@ -644,9 +655,15 @@ const generateIntents = (
 			];
 		case PageState.MIDDLE:
 			return [
-				<Button key={"check"} action="/check" value="check">
-					Refresh
-				</Button>,
+				isSearchMode ? (
+					<Button key={"restart"} action="/" value="restart">
+						Restart
+					</Button>
+				) : (
+					<Button key={"check"} action="/check" value="check">
+						Refresh
+					</Button>
+				),
 				tipButton(),
 				<Button key={"dec"} value="dec">
 					←
@@ -657,9 +674,15 @@ const generateIntents = (
 			];
 		case PageState.END:
 			return [
-				<Button key={"check"} action="/check" value="check">
-					Refresh
-				</Button>,
+				isSearchMode ? (
+					<Button key={"restart"} action="/" value="restart">
+						Restart
+					</Button>
+				) : (
+					<Button key={"check"} action="/check" value="check">
+						Refresh
+					</Button>
+				),
 				shareButton(),
 				tipButton(),
 				<Button key={"pageOne"} value="pageOne">
