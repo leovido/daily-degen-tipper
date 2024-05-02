@@ -190,6 +190,12 @@ const tipButton = () => {
 };
 
 app.frame("/", async (c) => {
+	const { deriveState } = c;
+
+	deriveState((previousState) => {
+		previousState.items = [];
+	});
+
 	return c.res({
 		image: (
 			<div

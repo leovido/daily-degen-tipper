@@ -1,7 +1,7 @@
 /** @jsxImportSource frog/jsx */
 
 import React from "react";
-import { Button, Frog } from "frog";
+import { Button, Frog, TextInput } from "frog";
 import { devtools } from "frog/dev";
 import { handle } from "frog/next";
 import { serveStatic } from "frog/serve-static";
@@ -86,10 +86,12 @@ const app = new Frog<{ State: State }>({
 // export const runtime = 'edge'
 
 app.frame("/check", async (c) => {
-	const { buttonValue, frameData, deriveState, verified } = c;
-	const forceRefresh = buttonValue === "check";
+	const { buttonValue, frameData, deriveState, verified, inputText } = c;
+	const forceRefresh = buttonValue === "myTips" || buttonValue === "check";
 
-	const fid = frameData?.fid || 0;
+	const searchFID = inputText || "";
+	const currentFID = frameData?.fid || 0;
+	const fid = searchFID.length > 0 ? searchFID : currentFID;
 
 	if (!verified) {
 		console.log(`Frame verification failed for ${frameData?.fid}`);
@@ -410,11 +412,17 @@ app.frame("/check", async (c) => {
 				)}
 			</div>
 		),
-		intents: generateIntents(state.pageState)
+		intents: generateIntents(state.pageState, inputText)
 	});
 });
 
 app.frame("/", async (c) => {
+	const { deriveState } = c;
+
+	deriveState((previousState) => {
+		previousState.items = [];
+	});
+
 	return c.res({
 		image: (
 			<div
@@ -435,14 +443,18 @@ app.frame("/", async (c) => {
 			</div>
 		),
 		intents: [
-			<Button key={"check"} action="/check" value="check">
-				Check
+			textInput(),
+			<Button key={"check"} action="/check" value="myTips">
+				My tips
 			</Button>,
 			// shareButton(),
 			tipButton(),
 			<Button.Link key={"ham-fun"} href="https://ham.fun">
 				ham.fun
-			</Button.Link>
+			</Button.Link>,
+			<Button key={"check"} action="/check" value="check">
+				🔍
+			</Button>
 		]
 	});
 });
@@ -585,13 +597,28 @@ const firstRun = async (fid: number, date: Date, forceRefresh: boolean) => {
 	};
 };
 
-const generateIntents = (pageState: PageState) => {
+const textInput = () => {
+	return (
+		<TextInput key={"text-input"} placeholder="Search any FID, e.g. 203666" />
+	);
+};
+
+const generateIntents = (
+	pageState: PageState,
+	inputText: string | undefined
+) => {
 	switch (pageState) {
 		case PageState.EMPTY: {
 			return [
-				<Button key={"check"} action="/check" value="check">
-					Refresh
-				</Button>,
+				inputText ? (
+					<Button key={"restart"} action="/" value="restart">
+						Restart
+					</Button>
+				) : (
+					<Button key={"check"} action="/check" value="check">
+						Refresh
+					</Button>
+				),
 				<Button.Link key={"ham-fun"} href="https://ham.fun">
 					ham.fun
 				</Button.Link>,
