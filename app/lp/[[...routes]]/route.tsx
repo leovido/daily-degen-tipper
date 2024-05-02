@@ -283,46 +283,16 @@ app.frame("/check", async (c) => {
 
 				{state.pages > 0 && <p style={{ color: "black" }}>{page}</p>}
 
-				{groupedArray.length > 1 && (
-					<div
-						style={{
-							display: "flex",
-							flexDirection: "row",
-							justifyContent: "space-around",
-							width: "50%"
-						}}
-					>
-						{groupedArray[state.currentPage].length > 5 && (
-							<>
-								<div
-									style={{
-										display: "flex",
-										flexDirection: "column"
-									}}
-								>
-									{singlePayslipView(
-										groupedArray,
-										false,
-										false,
-										state.currentPage
-									)}
-								</div>
-								<div
-									style={{
-										display: "flex",
-										flexDirection: "column"
-									}}
-								>
-									{singlePayslipView(
-										groupedArray,
-										false,
-										true,
-										state.currentPage
-									)}
-								</div>
-							</>
-						)}
-						{groupedArray[state.currentPage].length < 6 && (
+				<div
+					style={{
+						display: "flex",
+						flexDirection: "row",
+						justifyContent: "space-around",
+						width: "50%"
+					}}
+				>
+					{groupedArray[state.currentPage].length > 5 && (
+						<>
 							<div
 								style={{
 									display: "flex",
@@ -331,16 +301,37 @@ app.frame("/check", async (c) => {
 							>
 								{singlePayslipView(
 									groupedArray,
-									true,
+									false,
 									false,
 									state.currentPage
 								)}
 							</div>
-						)}
-					</div>
-				)}
-				{groupedArray.length < 2 &&
-					singlePayslipView(groupedArray, true, false, state.currentPage)}
+							<div
+								style={{
+									display: "flex",
+									flexDirection: "column"
+								}}
+							>
+								{singlePayslipView(
+									groupedArray,
+									false,
+									true,
+									state.currentPage
+								)}
+							</div>
+						</>
+					)}
+					{groupedArray[state.currentPage].length < 6 && (
+						<div
+							style={{
+								display: "flex",
+								flexDirection: "column"
+							}}
+						>
+							{singlePayslipView(groupedArray, true, false, state.currentPage)}
+						</div>
+					)}
+				</div>
 
 				{frameData !== undefined && groupedArray.length > 0 && (
 					<div
