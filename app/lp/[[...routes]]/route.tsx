@@ -89,9 +89,9 @@ app.frame("/check", async (c) => {
 	const { buttonValue, frameData, deriveState, verified, inputText } = c;
 	const forceRefresh = buttonValue === "myTips" || buttonValue === "check";
 
-	const searchFID = inputText || "";
+	const searchFID = inputText ? Number(inputText) : 0;
 	const currentFID = frameData?.fid || 0;
-	const fid = searchFID.length > 0 ? searchFID : currentFID;
+	const fid = searchFID > 0 ? searchFID : currentFID;
 
 	if (!verified) {
 		console.log(`Frame verification failed for ${frameData?.fid}`);
