@@ -17,6 +17,10 @@ interface State {
 	items: Array<Array<FCUser | undefined>>;
 }
 
+const initialState = {
+	currentPage: 0
+};
+
 enum PageState {
 	EMPTY,
 	BEGINNING,
@@ -30,9 +34,7 @@ const bodyColor = "#6B4E31";
 const footerColor = "#593E23";
 
 const app = new Frog<{ State: State }>({
-	initialState: {
-		currentPage: 0
-	},
+	initialState: initialState,
 	imageAspectRatio: "1:1",
 	assetsPath: "/",
 	basePath: "/lp",
@@ -172,20 +174,43 @@ app.frame("/check", async (c) => {
 					<h1
 						style={{
 							fontFamily: "DM Serif Display",
-							fontSize: 70,
+							fontSize: "3rem",
 							color: foregroundColor
 						}}
 					>
-						Sorry, your FID: {fid} is not eligible for ham tipping
+						🍖 Who did I tip today? 🍖
 					</h1>
-					<p style={{ fontSize: 45, color: foregroundColor }}>
+					<div
+						style={{
+							display: "flex",
+							flexDirection: "column",
+							alignItems: "center"
+						}}
+					>
+						<h1 style={{ fontFamily: "Roboto Slab", color: foregroundColor }}>
+							Sorry, FID: {fid} is not eligible
+						</h1>
+						<h1
+							style={{
+								fontFamily: "Robot Slab",
+								color: foregroundColor,
+								marginTop: -16
+							}}
+						>
+							for HAM tipping
+						</h1>
+					</div>
+					<h3 style={{ color: foregroundColor }}>
 						Visit https://based.thelp.xyz for more info
-					</p>
+					</h3>
 				</div>
 			),
 			intents: [
+				<Button key={"restart"} action="/" value={"restart"}>
+					Restart
+				</Button>,
 				<Button.Link key={"visit-lp"} href="https://based.thelp.xyz">
-					website
+					Website
 				</Button.Link>
 			]
 		});
@@ -283,16 +308,46 @@ app.frame("/check", async (c) => {
 
 				{state.pages > 0 && <p style={{ color: "black" }}>{page}</p>}
 
-				<div
-					style={{
-						display: "flex",
-						flexDirection: "row",
-						justifyContent: "space-around",
-						width: "50%"
-					}}
-				>
-					{groupedArray[state.currentPage].length > 5 && (
-						<>
+				{groupedArray.length > 0 && (
+					<div
+						style={{
+							display: "flex",
+							flexDirection: "row",
+							justifyContent: "space-around",
+							width: "50%"
+						}}
+					>
+						{groupedArray[state.currentPage].length > 5 && (
+							<>
+								<div
+									style={{
+										display: "flex",
+										flexDirection: "column"
+									}}
+								>
+									{singlePayslipView(
+										groupedArray,
+										false,
+										false,
+										state.currentPage
+									)}
+								</div>
+								<div
+									style={{
+										display: "flex",
+										flexDirection: "column"
+									}}
+								>
+									{singlePayslipView(
+										groupedArray,
+										false,
+										true,
+										state.currentPage
+									)}
+								</div>
+							</>
+						)}
+						{groupedArray[state.currentPage].length < 6 && (
 							<div
 								style={{
 									display: "flex",
@@ -301,37 +356,14 @@ app.frame("/check", async (c) => {
 							>
 								{singlePayslipView(
 									groupedArray,
-									false,
-									false,
-									state.currentPage
-								)}
-							</div>
-							<div
-								style={{
-									display: "flex",
-									flexDirection: "column"
-								}}
-							>
-								{singlePayslipView(
-									groupedArray,
-									false,
 									true,
+									false,
 									state.currentPage
 								)}
 							</div>
-						</>
-					)}
-					{groupedArray[state.currentPage].length < 6 && (
-						<div
-							style={{
-								display: "flex",
-								flexDirection: "column"
-							}}
-						>
-							{singlePayslipView(groupedArray, true, false, state.currentPage)}
-						</div>
-					)}
-				</div>
+						)}
+					</div>
+				)}
 
 				{frameData !== undefined && groupedArray.length > 0 && (
 					<div
