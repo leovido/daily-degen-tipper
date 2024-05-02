@@ -1,7 +1,7 @@
 /** @jsxImportSource frog/jsx */
 
 import React from "react";
-import { Button, Frog } from "frog";
+import { Button, Frog, TextInput } from "frog";
 import { devtools } from "frog/dev";
 import { handle } from "frog/next";
 import { serveStatic } from "frog/serve-static";
@@ -14,6 +14,7 @@ interface State {
 	currentPage: number;
 	pages: number;
 	pageState: PageState;
+	isSearchMode: boolean;
 	items: Array<Array<FCUser | undefined>>;
 	totalDegen: number;
 }
@@ -24,6 +25,15 @@ enum PageState {
 	MIDDLE,
 	END
 }
+
+const initialState = {
+	currentPage: 0,
+	pages: 0,
+	isSearchMode: false,
+	pageState: PageState.EMPTY,
+	items: [],
+	totalDegen: 0
+};
 
 const firstRun = async (fid: number, date: Date, forceRefresh: boolean) => {
 	const willRun = forceRefresh && process.env.CONFIG !== "DEV";
@@ -56,7 +66,17 @@ const firstRun = async (fid: number, date: Date, forceRefresh: boolean) => {
 	};
 };
 
-const generateIntents = (pageState: PageState) => {
+const textInput = () => {
+	return (
+		<TextInput key={"text-input"} placeholder="Search any FID, e.g. 203666" />
+	);
+};
+
+const generateIntents = (
+	pageState: PageState,
+	isSearchMode: boolean,
+	itemsLength: number
+) => {
 	switch (pageState) {
 		case PageState.EMPTY: {
 			const url = "https://warpcast.com/~/channel";
@@ -67,9 +87,15 @@ const generateIntents = (pageState: PageState) => {
 			const updatedURL = `${url}${randomChannel.toLowerCase()}`;
 
 			return [
-				<Button key={"check"} action="/check" value="check">
-					Refresh
-				</Button>,
+				isSearchMode ? (
+					<Button key={"restart"} action="/" value="restart">
+						Restart
+					</Button>
+				) : (
+					<Button key={"check"} action="/check" value="check">
+						Refresh
+					</Button>
+				),
 				<Button.Link key={"degen-tips"} href="https://degen.tips">
 					Visit degen.tips
 				</Button.Link>,
@@ -81,20 +107,34 @@ const generateIntents = (pageState: PageState) => {
 		}
 		case PageState.BEGINNING:
 			return [
-				<Button key={"check"} action="/check" value="check">
-					Refresh
-				</Button>,
+				isSearchMode ? (
+					<Button key={"restart"} action="/" value="restart">
+						Restart
+					</Button>
+				) : (
+					<Button key={"check"} action="/check" value="check">
+						Refresh
+					</Button>
+				),
 				shareButton(),
 				tipButton(),
-				<Button key={"inc"} value="inc">
-					→
-				</Button>
+				itemsLength > 10 && (
+					<Button key={"inc"} value="inc">
+						→
+					</Button>
+				)
 			];
 		case PageState.MIDDLE:
 			return [
-				<Button key={"check"} action="/check" value="check">
-					Refresh
-				</Button>,
+				isSearchMode ? (
+					<Button key={"restart"} action="/" value="restart">
+						Restart
+					</Button>
+				) : (
+					<Button key={"check"} action="/check" value="check">
+						Refresh
+					</Button>
+				),
 				tipButton(),
 				<Button key={"dec"} value="dec">
 					←
@@ -105,9 +145,15 @@ const generateIntents = (pageState: PageState) => {
 			];
 		case PageState.END:
 			return [
-				<Button key={"check"} action="/check" value="check">
-					Refresh
-				</Button>,
+				isSearchMode ? (
+					<Button key={"restart"} action="/" value="restart">
+						Restart
+					</Button>
+				) : (
+					<Button key={"check"} action="/check" value="check">
+						Refresh
+					</Button>
+				),
 				shareButton(),
 				tipButton(),
 				<Button key={"pageOne"} value="pageOne">
@@ -118,13 +164,7 @@ const generateIntents = (pageState: PageState) => {
 };
 
 const app = new Frog<{ State: State }>({
-	initialState: {
-		currentPage: 0,
-		pages: 0,
-		pageState: PageState.EMPTY,
-		items: [],
-		totalDegen: 0
-	},
+	initialState: initialState,
 	imageAspectRatio: "1:1",
 	assetsPath: "/",
 	basePath: "/api",
@@ -237,18 +277,22 @@ app.frame("/", async (c) => {
 			</div>
 		),
 		intents: [
-			<Button key={"check"} action="/check" value="check">
-				Check
+			textInput(),
+			<Button key={"check"} action="/check" value="myTips">
+				My tips
 			</Button>,
 			// shareButton(),
-			tipButton()
+			tipButton(),
+			<Button key={"check"} action="/check" value="check">
+				🔍
+			</Button>
 		]
 	});
 });
 
 app.frame("/check", async (c) => {
-	const { buttonValue, frameData, deriveState, verified } = c;
-	const forceRefresh = buttonValue === "check";
+	const { buttonValue, frameData, deriveState, verified, inputText } = c;
+	const forceRefresh = buttonValue === "myTips" || buttonValue === "check";
 
 	const isDevEnvironment = process.env.CONFIG === "DEV";
 
@@ -291,7 +335,10 @@ app.frame("/check", async (c) => {
 		});
 	}
 
-	const fid = frameData?.fid || 0;
+	const searchFID =
+		inputText && buttonValue === "check" ? Number(inputText) : 0;
+	const currentFID = frameData?.fid || 0;
+	const fid = searchFID > 0 ? searchFID : currentFID;
 
 	const request = await fetch(
 		`https://www.degen.tips/api/airdrop2/tip-allowance?fid=${fid}`,
@@ -383,6 +430,11 @@ app.frame("/check", async (c) => {
 	);
 
 	const state = deriveState((previousState) => {
+		if (searchFID !== 0) {
+			previousState.isSearchMode = true;
+		} else {
+			previousState.isSearchMode = false;
+		}
 		switch (buttonValue) {
 			case "dec":
 				previousState.currentPage = Math.max(0, previousState.currentPage - 1);
@@ -398,6 +450,7 @@ app.frame("/check", async (c) => {
 				previousState.pageState = PageState.BEGINNING;
 				break;
 			case "refresh":
+			case "myTips":
 			case "check":
 				previousState.totalDegen = total;
 				previousState.pages = grouped.length;
@@ -407,7 +460,7 @@ app.frame("/check", async (c) => {
 				break;
 		}
 
-		if (previousState.pages === 1) {
+		if (previousState.pages === 0) {
 			previousState.pageState = PageState.EMPTY;
 		} else if (previousState.currentPage === 0) {
 			previousState.pageState = PageState.BEGINNING;
@@ -600,7 +653,11 @@ app.frame("/check", async (c) => {
 				)}
 			</div>
 		),
-		intents: generateIntents(state.pageState)
+		intents: generateIntents(
+			state.pageState,
+			state.isSearchMode,
+			state.items.length
+		)
 	});
 });
 

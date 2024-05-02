@@ -247,6 +247,7 @@ app.frame("/check", async (c) => {
 				previousState.pageState = PageState.BEGINNING;
 				break;
 			case "refresh":
+			case "myTips":
 			case "check":
 				previousState.pages = grouped.length;
 				previousState.items = grouped;
@@ -255,7 +256,7 @@ app.frame("/check", async (c) => {
 				break;
 		}
 
-		if (previousState.pages === 1) {
+		if (previousState.pages === 0) {
 			previousState.pageState = PageState.EMPTY;
 		} else if (previousState.currentPage === 0) {
 			previousState.pageState = PageState.BEGINNING;
