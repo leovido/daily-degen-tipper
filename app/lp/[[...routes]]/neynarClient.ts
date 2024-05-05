@@ -11,7 +11,8 @@ const castWithMatchedHam = (author: string, castText: string) => {
 		const formatted = kFormatter(amount.toString());
 
 		return {
-			hamValue: formatted,
+			hamValueFormatted: formatted,
+			hamValue: amount,
 			author
 		};
 	}
@@ -48,6 +49,7 @@ export const client = async (fid: number, date: Date) => {
 			const user = response.users.find((user) => user.username);
 			return {
 				username: user?.username || "",
+				tipAmountFormatted: cast.hamValueFormatted,
 				tipAmount: cast.hamValue,
 				fid: user?.fid || 0
 			};

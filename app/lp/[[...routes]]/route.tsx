@@ -150,7 +150,7 @@ app.frame("/check", async (c) => {
 		throw new Error(`fetchAllowance: ${e}`);
 	});
 
-	const { allowance: allowanceResponse, used } = await fetchAllowance
+	const { allowance: allowanceResponse } = await fetchAllowance
 		.json()
 		.catch((e) => {
 			console.error(`fetchAllowance: ${e}`);
@@ -224,7 +224,11 @@ app.frame("/check", async (c) => {
 	const date = new Date();
 
 	const { pfpURL, username } = await fetchUserInfo(fid);
-	const { groupedArray: grouped } = await firstRun(fid, date, forceRefresh);
+	const { groupedArray: grouped, totalHam } = await firstRun(
+		fid,
+		date,
+		forceRefresh
+	);
 
 	const state = deriveState((previousState) => {
 		if (searchFID !== 0) {
@@ -273,7 +277,7 @@ app.frame("/check", async (c) => {
 	const page = `${state.currentPage + 1}/${state.pages}`;
 	const allowance = Math.trunc(allowanceResponse);
 	const groupedArray = forceRefresh ? grouped : state.items;
-	const remainingHam = allowance - used;
+	const remainingHam = allowance - Number(totalHam);
 
 	return c.res({
 		image: (
@@ -561,7 +565,7 @@ const mappedView = (
 					paddingLeft: 16
 				}}
 			>
-				{`${u?.tipAmount}`}
+				{`${u?.tipAmountFormatted}`}
 			</h2>
 		</div>
 	));

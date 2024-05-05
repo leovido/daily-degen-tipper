@@ -4,6 +4,7 @@ import { kFormatter } from "@/app/numberFormattingKs";
 
 export interface FCUser {
 	username: string;
+	tipAmountFormatted?: string;
 	tipAmount?: string;
 	fid: number;
 }
@@ -30,7 +31,8 @@ export const client = async (
 				const extractDegenString = match[1];
 				const formatted = kFormatter(extractDegenString);
 				return {
-					tipAmount: formatted || "",
+					tipAmountFormatted: formatted || "",
+					tipAmount: extractDegenString || "",
 					author: cast.parentAuthor.fid || ""
 				};
 			}
@@ -50,6 +52,7 @@ export const client = async (
 
 				const val: FCUser = {
 					username: user?.username || "",
+					tipAmountFormatted: value?.tipAmountFormatted,
 					tipAmount: value?.tipAmount || "",
 					fid: user?.fid || 0
 				};
