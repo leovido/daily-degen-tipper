@@ -313,6 +313,7 @@ app.frame("/check", async (c) => {
 						src={pfpURL}
 						width={"40"}
 						height={"40"}
+						objectFit="cover"
 					></Image>
 					<h1
 						style={{
