@@ -12,7 +12,7 @@ const castWithMatchedHam = (author: string, castText: string) => {
 
 		return {
 			hamValueFormatted: formatted,
-			hamValue: amount,
+			hamValue: `${amount}`,
 			author
 		};
 	}

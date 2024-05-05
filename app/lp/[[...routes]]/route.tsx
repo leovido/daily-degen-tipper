@@ -16,6 +16,7 @@ interface State {
 	pageState: PageState;
 	isSearchMode: boolean;
 	items: Array<Array<FCUser | undefined>>;
+	totalHam: number;
 }
 
 const initialState = {
@@ -224,7 +225,7 @@ app.frame("/check", async (c) => {
 	const date = new Date();
 
 	const { pfpURL, username } = await fetchUserInfo(fid);
-	const { groupedArray: grouped, totalHam } = await firstRun(
+	const { groupedArray: grouped, totalHam: total } = await firstRun(
 		fid,
 		date,
 		forceRefresh
@@ -255,6 +256,7 @@ app.frame("/check", async (c) => {
 			case "check":
 				previousState.pages = grouped.length;
 				previousState.items = grouped;
+				previousState.totalHam = total;
 				break;
 			default:
 				break;
@@ -277,6 +279,8 @@ app.frame("/check", async (c) => {
 	const page = `${state.currentPage + 1}/${state.pages}`;
 	const allowance = Math.trunc(allowanceResponse);
 	const groupedArray = forceRefresh ? grouped : state.items;
+	const totalHam = forceRefresh ? total : state.totalHam;
+
 	const remainingHam = allowance - Number(totalHam);
 
 	return c.res({
