@@ -10,39 +10,16 @@ export const isWithinTimeRange = (
 	timestamp: string
 ) => {
 	const date = new Date(timestamp);
-	const tomorrow = new Date(today);
-	tomorrow.setDate(tomorrow.getDate() + 1);
 
-	const hours = today.getUTCHours().toString().padStart(2, "0");
-	const minutes = today.getUTCMinutes().toString().padStart(2, "0");
-	const formattedTime = `${hours}${minutes}`;
-	const deadlineNumber = Number(formattedTime);
+	const todayStart = new Date(today);
+	todayStart.setUTCHours(0, 0, 0, 0);
 
-	if (deadlineNumber < 735) {
-		const yesterday = new Date(today);
-		yesterday.setDate(yesterday.getDate() - 1);
-		yesterday.setUTCHours(7, 35, 0, 0);
+	const todayEnd = new Date(today);
+	todayEnd.setUTCHours(23, 59, 59, 999);
 
-		const todayEnd = new Date(today);
-		todayEnd.setUTCHours(7, 34, 59, 999);
+	const isTodayInRange = date >= todayStart && date <= todayEnd;
 
-		return date >= yesterday && date <= todayEnd;
-	} else {
-		const todayStart = new Date(today);
-		todayStart.setUTCHours(7, 35, 0, 0);
-
-		const todayEnd = new Date(tomorrow);
-		todayEnd.setUTCHours(7, 34, 59, 999);
-
-		const isTodayInRange = date >= todayStart && date <= todayEnd;
-		const nextDayStart = new Date(tomorrow);
-		nextDayStart.setUTCHours(0, 0, 0, 0);
-		const nextDayEnd = new Date(tomorrow);
-		nextDayEnd.setUTCHours(7, 34, 59, 999);
-		const isNextDayInRange = date >= nextDayStart && date <= nextDayEnd;
-
-		return isTodayInRange || isNextDayInRange;
-	}
+	return isTodayInRange;
 };
 
 export const isWithinTimeRangeLP = (

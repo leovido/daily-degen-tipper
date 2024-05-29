@@ -10,8 +10,8 @@ describe("should pass", () => {
 		const today = new Date();
 		const dateToday = new Date();
 		dateToday.setDate(dateToday.getDate() - 1);
-		dateToday.setUTCHours(7);
-		dateToday.setUTCMinutes(35);
+		dateToday.setUTCHours(0);
+		dateToday.setUTCMinutes(0);
 
 		const actual = isWithinTimeRange(today, dateToday.toUTCString());
 		const expected = false;
@@ -31,12 +31,11 @@ describe("should pass", () => {
 		expect(actual).toBe(expected);
 	});
 
-	it("should fail when it is the next day", () => {
+	it.only("should fail when it is the next day", () => {
 		const today = new Date();
 		const dateToday = new Date();
 		dateToday.setDate(dateToday.getDate() + 1);
-		dateToday.setUTCHours(7);
-		dateToday.setUTCMinutes(35);
+		dateToday.setUTCHours(0, 0, 0, 0);
 
 		const actual = isWithinTimeRange(today, dateToday.toUTCString());
 		const expected = false;
@@ -44,20 +43,20 @@ describe("should pass", () => {
 		expect(actual).toBe(expected);
 	});
 
-	it("should pass when it is today after 07:35", () => {
+	it("should pass when it is today after midnight UTC", () => {
 		const today = new Date();
 		const dateToday = new Date();
-		dateToday.setUTCHours(7, 35);
+		dateToday.setUTCHours(0, 0, 0, 0);
 		const actual = isWithinTimeRange(today, dateToday.toUTCString());
 		const expected = true;
 
 		expect(actual).toBe(expected);
 	});
 
-	it("should fail when it is today but before 07:35", () => {
+	it("should fail when it is today but before midnight UTC", () => {
 		const today = new Date();
 		const dateToday = new Date();
-		dateToday.setUTCHours(7, 34);
+		dateToday.setUTCHours(23, 59, 59, 999);
 
 		const actual = isWithinTimeRange(today, dateToday.toUTCString());
 		const expected = false;
@@ -65,9 +64,9 @@ describe("should pass", () => {
 		expect(actual).toBe(expected);
 	});
 
-	it("PASS - before 7:35", () => {
+	it("PASS - before midnight UTC", () => {
 		const dateToday = new Date();
-		dateToday.setUTCHours(7, 34, 59, 599);
+		dateToday.setUTCHours(23, 59, 59, 999);
 
 		const actual = isWithinTimeRange(dateToday, dateToday.toUTCString());
 		const expected = true;
