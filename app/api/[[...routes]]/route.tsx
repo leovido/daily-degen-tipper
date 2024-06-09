@@ -206,7 +206,7 @@ const generateIntents = (
 };
 
 const app = new Frog<{ State: State }>({
-	verify: false,
+	verify: process.env.CONFIG === "PROD",
 	initialState: initialState,
 	imageAspectRatio: "1:1",
 	assetsPath: "/",
