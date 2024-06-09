@@ -9,6 +9,7 @@ import { vars } from "./ui";
 import { type FCUser, client } from "./client";
 import { type DegenResponse } from "./types";
 import { boostedChannels } from "./pill";
+import { kv } from "@vercel/kv";
 
 interface State {
 	currentPage: number;
@@ -16,7 +17,9 @@ interface State {
 	pageState: PageState;
 	isSearchMode: boolean;
 	items: Array<Array<FCUser | undefined>>;
+	itemsLength: number;
 	totalDegen: number;
+	currentFIDSearch: number;
 }
 
 enum PageState {
@@ -32,11 +35,24 @@ const initialState = {
 	isSearchMode: false,
 	pageState: PageState.EMPTY,
 	items: [],
+	itemsLength: 0,
 	totalDegen: 0
 };
 
 const firstRun = async (fid: number, date: Date, forceRefresh: boolean) => {
 	const willRun = forceRefresh && process.env.CONFIG !== "DEV";
+	if (!willRun) {
+		const response = await fetchExistingItems(fid).catch((e) => {
+			console.error(`fetchExistingItems error: ${e}`);
+
+			throw new Error(`fetchExistingItems error: ${e}`);
+		});
+
+		return {
+			totalDegen: response.totalDegen,
+			groupedArray: response.items
+		};
+	}
 	const items: (FCUser | undefined)[] = willRun
 		? await client(fid, date).catch((e) => {
 				console.error(`client items error: ${e}`);
@@ -60,9 +76,35 @@ const firstRun = async (fid: number, date: Date, forceRefresh: boolean) => {
 		(_, index) => items.slice(index * 10, index * 10 + 10)
 	);
 
+	if (willRun) {
+		await kv.set(`${fid}-degen`, JSON.stringify({ groupedArray }));
+	}
+
 	return {
 		totalDegen,
 		groupedArray
+	};
+};
+
+const fetchExistingItems = async (fid: number) => {
+	const responseItems: { groupedArray: (FCUser | undefined)[] } | null =
+		await kv.get(`${fid}-degen`);
+
+	const items = responseItems?.groupedArray ?? [];
+
+	const totalDegen = items.flat().reduce((acc, item) => {
+		if (item) {
+			const amount = item.tipAmount ?? 0;
+
+			return acc + Number(amount);
+		} else {
+			return acc + 0;
+		}
+	}, 0);
+
+	return {
+		totalDegen,
+		items
 	};
 };
 
@@ -164,6 +206,7 @@ const generateIntents = (
 };
 
 const app = new Frog<{ State: State }>({
+	verify: process.env.CONFIG === "PROD",
 	initialState: initialState,
 	imageAspectRatio: "1:1",
 	assetsPath: "/",
@@ -338,10 +381,15 @@ app.frame("/check", async (c) => {
 	const searchFID =
 		inputText && buttonValue === "check" ? Number(inputText) : 0;
 	const currentFID = frameData?.fid || 0;
-	const fid = searchFID > 0 ? searchFID : currentFID;
 
+	const fid = searchFID > 0 ? searchFID : currentFID;
+	const state2 = deriveState((previousState) => {
+		if (forceRefresh) {
+			previousState.currentFIDSearch = searchFID > 0 ? searchFID : currentFID;
+		}
+	});
 	const request = await fetch(
-		`https://www.degen.tips/api/airdrop2/tip-allowance?fid=${fid}`,
+		`https://www.degen.tips/api/airdrop2/tip-allowance?fid=${state2.currentFIDSearch}`,
 		{
 			headers: {
 				"Content-Type": "application/json",
@@ -424,7 +472,7 @@ app.frame("/check", async (c) => {
 
 	const date = new Date();
 	const { totalDegen: total, groupedArray: grouped } = await firstRun(
-		fid,
+		state2.currentFIDSearch,
 		date,
 		forceRefresh
 	);
@@ -454,7 +502,8 @@ app.frame("/check", async (c) => {
 			case "check":
 				previousState.totalDegen = total;
 				previousState.pages = grouped.length;
-				previousState.items = grouped;
+				previousState.currentFIDSearch = searchFID > 0 ? searchFID : currentFID;
+				// previousState.items = grouped;
 				break;
 			default:
 				break;
@@ -476,7 +525,7 @@ app.frame("/check", async (c) => {
 
 	const page = `${state.currentPage + 1}/${state.pages}`;
 	const totalDegen = forceRefresh ? total : state.totalDegen;
-	const groupedArray = forceRefresh ? grouped : state.items;
+	const groupedArray = grouped;
 
 	return c.res({
 		image: (
@@ -656,7 +705,7 @@ app.frame("/check", async (c) => {
 		intents: generateIntents(
 			state.pageState,
 			state.isSearchMode,
-			state.items.length
+			state.pages * 10
 		)
 	});
 });
