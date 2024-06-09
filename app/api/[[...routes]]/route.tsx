@@ -87,7 +87,7 @@ const firstRun = async (fid: number, date: Date, forceRefresh: boolean) => {
 };
 
 const fetchExistingItems = async (fid: number) => {
-	const responseItems: { groupedArray: (FCUser | undefined)[] } | null =
+	const responseItems: { groupedArray: (FCUser | undefined)[][] } | null =
 		await kv.get(`${fid}-degen`);
 
 	const items = responseItems?.groupedArray ?? [];
@@ -206,7 +206,7 @@ const generateIntents = (
 };
 
 const app = new Frog<{ State: State }>({
-	verify: process.env.CONFIG === "PROD",
+	verify: false,
 	initialState: initialState,
 	imageAspectRatio: "1:1",
 	assetsPath: "/",
