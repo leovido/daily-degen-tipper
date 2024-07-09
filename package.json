@@ -53,6 +53,6 @@
 		"prettier": "^3.2.5",
 		"ts-jest": "^29.1.2",
 		"typescript": "^5.4.5",
-		"vercel": "^34.2.6"
+		"vercel": "^34.3.1"
 	}
 }
