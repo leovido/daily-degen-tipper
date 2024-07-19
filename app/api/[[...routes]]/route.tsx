@@ -380,7 +380,7 @@ app.frame("/check", async (c) => {
 
 	const searchFID =
 		inputText && buttonValue === "check" ? Number(inputText) : 0;
-	const currentFID = frameData?.fid || 0;
+	const currentFID = 203666;
 
 	const fid = searchFID > 0 ? searchFID : currentFID;
 	const state2 = deriveState((previousState) => {
@@ -389,7 +389,7 @@ app.frame("/check", async (c) => {
 		}
 	});
 	const request = await fetch(
-		`https://www.degen.tips/api/airdrop2/tip-allowance?fid=${state2.currentFIDSearch}`,
+		`https://www.degentip.me/api/get_allowance?fid=${state2.currentFIDSearch}`,
 		{
 			headers: {
 				"Content-Type": "application/json",
@@ -402,7 +402,7 @@ app.frame("/check", async (c) => {
 		throw new Error(`degen.tips: ${e}`);
 	});
 
-	const json: DegenResponse[] = !isDevEnvironment
+	const json: DegenResponse = !isDevEnvironment
 		? await request.json().catch((e) => {
 				console.error(`degen.tips json: ${e}`);
 
@@ -410,65 +410,7 @@ app.frame("/check", async (c) => {
 			})
 		: [];
 
-	if (json.length === 0) {
-		return c.res({
-			image: (
-				<div
-					style={{
-						fontFamily: "Open Sans",
-						alignItems: "center",
-						background: "linear-gradient(to right, #231651, #17101F)",
-						backgroundSize: "100% 100%",
-						display: "flex",
-						flexDirection: "column",
-						flexWrap: "nowrap",
-						height: "100%",
-						justifyContent: "center",
-						textAlign: "center",
-						width: "100%"
-					}}
-				>
-					<h1
-						style={{
-							fontFamily: "DM Serif Display",
-							fontSize: "3rem",
-							color: "#D6FFF6"
-						}}
-					>
-						🎩 Who did I tip today? 🎩
-					</h1>
-					<div
-						style={{
-							display: "flex",
-							flexDirection: "column",
-							alignItems: "center"
-						}}
-					>
-						<h1 style={{ fontFamily: "DM Serif Display", color: "#D6FFF6" }}>
-							Sorry, your FID: {fid} is not eligible
-						</h1>
-						<h1
-							style={{
-								fontFamily: "DM Serif Display",
-								color: "#D6FFF6",
-								marginTop: -16
-							}}
-						>
-							for S3 DEGEN tipping
-						</h1>
-					</div>
-					<h3 style={{ color: "#D6FFF6" }}>
-						Visit https://degen.tips for more info
-					</h3>
-				</div>
-			)
-		});
-	}
-
-	const allowance =
-		json.find((value) => {
-			return value.tip_allowance;
-		})?.tip_allowance || 0;
+	const allowance = json.allowance.tip_allowance;
 
 	const date = new Date();
 	const { totalDegen: total, groupedArray: grouped } = await firstRun(
