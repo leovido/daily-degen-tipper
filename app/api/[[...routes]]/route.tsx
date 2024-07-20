@@ -380,7 +380,7 @@ app.frame("/check", async (c) => {
 
 	const searchFID =
 		inputText && buttonValue === "check" ? Number(inputText) : 0;
-	const currentFID = 203666;
+	const currentFID = frameData?.fid || 0;
 
 	const fid = searchFID > 0 ? searchFID : currentFID;
 	const state2 = deriveState((previousState) => {
