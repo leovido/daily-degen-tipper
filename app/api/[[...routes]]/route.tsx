@@ -389,7 +389,7 @@ app.frame("/check", async (c) => {
 		}
 	});
 	const request = await fetch(
-		`https://www.degentip.me/api/get_allowance?fid=${state2.currentFIDSearch}`,
+		`https://www.degentip.me/api/get_allowance?fid=${fid}`,
 		{
 			headers: {
 				"Content-Type": "application/json",
