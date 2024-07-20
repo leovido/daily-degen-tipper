@@ -1,7 +1,7 @@
 import { type DegenResponse } from "./types";
 
-export const mockDegenResponse: DegenResponse[] = [
-	{
+export const mockDegenResponse: DegenResponse = {
+	allowance: {
 		remaining_allowance: "20",
 		tip_allowance: "9999",
 		avatar_url: "https://placehold.co/600x400.png",
@@ -10,4 +10,4 @@ export const mockDegenResponse: DegenResponse[] = [
 		wallet_address: "0xwallet",
 		display_name: "Tester"
 	}
-];
+};
