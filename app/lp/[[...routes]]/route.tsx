@@ -129,11 +129,7 @@ app.frame("/check", async (c) => {
 					</p>
 				</div>
 			),
-			intents: [
-				<Button key={"restart"} action="/">
-					Restart
-				</Button>
-			]
+			intents: [<Button action="/">Restart</Button>]
 		});
 	}
 
@@ -212,12 +208,10 @@ app.frame("/check", async (c) => {
 				</div>
 			),
 			intents: [
-				<Button key={"restart"} action="/" value={"restart"}>
+				<Button action="/" value={"restart"}>
 					Restart
 				</Button>,
-				<Button.Link key={"visit-lp"} href="https://based.thelp.xyz">
-					Website
-				</Button.Link>
+				<Button.Link href="https://based.thelp.xyz">Website</Button.Link>
 			]
 		});
 	}
@@ -462,15 +456,13 @@ app.frame("/", async (c) => {
 		),
 		intents: [
 			textInput(),
-			<Button key={"check"} action="/check" value="myTips">
+			<Button action="/check" value="myTips">
 				My tips
 			</Button>,
 			// shareButton(),
 			tipButton(),
-			<Button.Link key={"ham-fun"} href="https://ham.fun">
-				ham.fun
-			</Button.Link>,
-			<Button key={"check"} action="/check" value="check">
+			<Button.Link href="https://ham.fun">ham.fun</Button.Link>,
+			<Button action="/check" value="check">
 				🔍
 			</Button>
 		]
@@ -578,7 +570,7 @@ const mappedView = (
 
 const tipButton = () => {
 	return (
-		<Button.Link key={"tip"} href="https://warpcast.com/leovido.eth/0x3dacd8c6">
+		<Button.Link href="https://warpcast.com/leovido.eth/0x3dacd8c6">
 			Tip here
 		</Button.Link>
 	);
@@ -616,9 +608,7 @@ const firstRun = async (fid: number, date: Date, forceRefresh: boolean) => {
 };
 
 const textInput = () => {
-	return (
-		<TextInput key={"text-input"} placeholder="Search any FID, e.g. 203666" />
-	);
+	return <TextInput placeholder="Search any FID, e.g. 203666" />;
 };
 
 const generateIntents = (pageState: PageState, isSearchMode: boolean) => {
@@ -626,21 +616,16 @@ const generateIntents = (pageState: PageState, isSearchMode: boolean) => {
 		case PageState.EMPTY: {
 			return [
 				isSearchMode ? (
-					<Button key={"restart"} action="/" value="restart">
+					<Button action="/" value="restart">
 						Restart
 					</Button>
 				) : (
-					<Button key={"check"} action="/check" value="check">
+					<Button action="/check" value="check">
 						Refresh
 					</Button>
 				),
-				<Button.Link key={"ham-fun"} href="https://ham.fun">
-					ham.fun
-				</Button.Link>,
-				<Button.Link
-					key={"l3-news"}
-					href="https://warpcast.com/deployer/0x388a831b"
-				>
+				<Button.Link href="https://ham.fun">ham.fun</Button.Link>,
+				<Button.Link href="https://warpcast.com/deployer/0x388a831b">
 					L3 🍖 news
 				</Button.Link>,
 				tipButton()
@@ -649,65 +634,54 @@ const generateIntents = (pageState: PageState, isSearchMode: boolean) => {
 		case PageState.BEGINNING:
 			return [
 				isSearchMode ? (
-					<Button key={"restart"} action="/" value="restart">
+					<Button action="/" value="restart">
 						Restart
 					</Button>
 				) : (
-					<Button key={"check"} action="/check" value="check">
+					<Button action="/check" value="check">
 						Refresh
 					</Button>
 				),
 				shareButton(),
 				tipButton(),
-				<Button key={"inc"} value="inc">
-					→
-				</Button>
+				<Button value="inc">→</Button>
 			];
 		case PageState.MIDDLE:
 			return [
 				isSearchMode ? (
-					<Button key={"restart"} action="/" value="restart">
+					<Button action="/" value="restart">
 						Restart
 					</Button>
 				) : (
-					<Button key={"check"} action="/check" value="check">
+					<Button action="/check" value="check">
 						Refresh
 					</Button>
 				),
 				tipButton(),
-				<Button key={"dec"} value="dec">
-					←
-				</Button>,
-				<Button key={"inc"} value="inc">
-					→
-				</Button>
+				<Button value="dec">←</Button>,
+				<Button value="inc">→</Button>
 			];
 		case PageState.END:
 			return [
 				isSearchMode ? (
-					<Button key={"restart"} action="/" value="restart">
+					<Button action="/" value="restart">
 						Restart
 					</Button>
 				) : (
-					<Button key={"check"} action="/check" value="check">
+					<Button action="/check" value="check">
 						Refresh
 					</Button>
 				),
 				shareButton(),
 				tipButton(),
-				<Button key={"pageOne"} value="pageOne">
-					Page 1
-				</Button>
+				<Button value="pageOne">Page 1</Button>
 			];
 	}
 };
 
 const shareButton = () => {
 	return (
-		<Button.Redirect
-			key={"share"}
-			location="https://warpcast.com/~/compose?text=Check%20who%20you%20ham%20tipped%21%0A%0AFrame%20by%20@leovido.eth&embeds[]=https%3A%2F%2Fham-me.leovido.xyz%2Flp"
-		>
+		<Button.Redirect location="https://warpcast.com/~/compose?text=Check%20who%20you%20ham%20tipped%21%0A%0AFrame%20by%20@leovido.eth&embeds[]=https%3A%2F%2Fham-me.leovido.xyz%2Flp">
 			Share
 		</Button.Redirect>
 	);

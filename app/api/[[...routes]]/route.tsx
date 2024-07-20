@@ -109,9 +109,7 @@ const fetchExistingItems = async (fid: number) => {
 };
 
 const textInput = () => {
-	return (
-		<TextInput key={"text-input"} placeholder="Search any FID, e.g. 203666" />
-	);
+	return <TextInput placeholder="Search any FID, e.g. 203666" />;
 };
 
 const generateIntents = (
@@ -130,18 +128,16 @@ const generateIntents = (
 
 			return [
 				isSearchMode ? (
-					<Button key={"restart"} action="/" value="restart">
+					<Button action="/" value="restart">
 						Restart
 					</Button>
 				) : (
-					<Button key={"check"} action="/check" value="check">
+					<Button action="/check" value="check">
 						Refresh
 					</Button>
 				),
-				<Button.Link key={"degen-tips"} href="https://degen.tips">
-					Visit degen.tips
-				</Button.Link>,
-				<Button.Link key={"boosted-channel"} href={updatedURL}>
+				<Button.Link href="https://degen.tips">Visit degen.tips</Button.Link>,
+				<Button.Link href={updatedURL}>
 					Visit random boosted channel
 				</Button.Link>,
 				tipButton()
@@ -150,57 +146,47 @@ const generateIntents = (
 		case PageState.BEGINNING:
 			return [
 				isSearchMode ? (
-					<Button key={"restart"} action="/" value="restart">
+					<Button action="/" value="restart">
 						Restart
 					</Button>
 				) : (
-					<Button key={"check"} action="/check" value="check">
+					<Button action="/check" value="check">
 						Refresh
 					</Button>
 				),
 				shareButton(),
 				tipButton(),
-				itemsLength > 10 && (
-					<Button key={"inc"} value="inc">
-						→
-					</Button>
-				)
+				itemsLength > 10 && <Button value="inc">→</Button>
 			];
 		case PageState.MIDDLE:
 			return [
 				isSearchMode ? (
-					<Button key={"restart"} action="/" value="restart">
+					<Button action="/" value="restart">
 						Restart
 					</Button>
 				) : (
-					<Button key={"check"} action="/check" value="check">
+					<Button action="/check" value="check">
 						Refresh
 					</Button>
 				),
 				tipButton(),
-				<Button key={"dec"} value="dec">
-					←
-				</Button>,
-				<Button key={"inc"} value="inc">
-					→
-				</Button>
+				<Button value="dec">←</Button>,
+				<Button value="inc">→</Button>
 			];
 		case PageState.END:
 			return [
 				isSearchMode ? (
-					<Button key={"restart"} action="/" value="restart">
+					<Button action="/" value="restart">
 						Restart
 					</Button>
 				) : (
-					<Button key={"check"} action="/check" value="check">
+					<Button action="/check" value="check">
 						Refresh
 					</Button>
 				),
 				shareButton(),
 				tipButton(),
-				<Button key={"pageOne"} value="pageOne">
-					Page 1
-				</Button>
+				<Button value="pageOne">Page 1</Button>
 			];
 	}
 };
@@ -255,10 +241,7 @@ const app = new Frog<{ State: State }>({
 
 const shareButton = () => {
 	return (
-		<Button.Redirect
-			key={"share"}
-			location="https://warpcast.com/~/compose?text=Check%20who%20you%20tipped%21%0A%0AFrame%20by%20@leovido.eth&embeds[]=https%3A%2F%2Fdegen-me.leovido.xyz%2Fapi"
-		>
+		<Button.Redirect location="https://warpcast.com/~/compose?text=Check%20who%20you%20tipped%21%0A%0AFrame%20by%20@leovido.eth&embeds[]=https%3A%2F%2Fdegen-me.leovido.xyz%2Fapi">
 			Share
 		</Button.Redirect>
 	);
@@ -266,7 +249,7 @@ const shareButton = () => {
 
 const tipButton = () => {
 	return (
-		<Button.Link key={"tip"} href="https://warpcast.com/leovido.eth/0x9812de51">
+		<Button.Link href="https://warpcast.com/leovido.eth/0x9812de51">
 			Tip @leovido.eth
 		</Button.Link>
 	);
@@ -321,12 +304,12 @@ app.frame("/", async (c) => {
 		),
 		intents: [
 			textInput(),
-			<Button key={"check"} action="/check" value="myTips">
+			<Button action="/check" value="myTips">
 				My tips
 			</Button>,
 			// shareButton(),
 			tipButton(),
-			<Button key={"check"} action="/check" value="check">
+			<Button action="/check" value="check">
 				🔍
 			</Button>
 		]
@@ -370,11 +353,7 @@ app.frame("/check", async (c) => {
 					</p>
 				</div>
 			),
-			intents: [
-				<Button key={"restart"} action="/">
-					Restart
-				</Button>
-			]
+			intents: [<Button action="/">Restart</Button>]
 		});
 	}
 
