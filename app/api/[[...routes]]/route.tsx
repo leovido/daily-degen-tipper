@@ -199,6 +199,7 @@ const app = new Frog<{ State: State }>({
 	basePath: "/api",
 	ui: { vars },
 	imageOptions: {
+		emoji: "blobmoji",
 		fonts: [
 			{
 				name: "Roboto",
@@ -297,7 +298,24 @@ app.frame("/", async (c) => {
 				>
 					🎩 $DEGEN edition 🎩
 				</h1>
-				<h4 style={{ fontSize: "1.75rem", color: "#D6FFF6", fontWeight: 400 }}>
+				<h1
+					style={{
+						fontFamily: "Open Sans",
+						fontSize: "1.6rem",
+						color: "#38BDF8",
+						marginTop: -24
+					}}
+				>
+					Season 6
+				</h1>
+				<h4
+					style={{
+						fontSize: "1.75rem",
+						color: "#D6FFF6",
+						fontFamily: "DM Serif Display",
+						fontWeight: 400
+					}}
+				>
 					Frame by @leovido.eth
 				</h4>
 			</div>
@@ -581,33 +599,6 @@ app.frame("/check", async (c) => {
 					>
 						<h2 style={{ color: "#D6FFF6", fontWeight: 400 }}>
 							You haven&apos;t tipped today
-						</h2>
-						<h2 style={{ color: "#D6FFF6", fontWeight: 400 }}>
-							Tips on casts in the following channels
-						</h2>
-						<h2 style={{ color: "#D6FFF6", fontWeight: 400, marginTop: -16 }}>
-							receive a 1.5x boost:{" "}
-						</h2>
-						<h2 style={{ color: "rgba(135, 206, 235, 1)", fontWeight: 700 }}>
-							/farcastHER, /FarCon, /frames, /Base
-						</h2>
-						<h2
-							style={{
-								color: "rgba(135, 206, 235, 1)",
-								fontWeight: 700,
-								marginTop: -16
-							}}
-						>
-							/Dev, /Design, /Frontend, /Founders
-						</h2>
-						<h2
-							style={{
-								color: "rgba(135, 206, 235, 1)",
-								fontWeight: 700,
-								marginTop: -16
-							}}
-						>
-							/perl, /Product, and /Zora
 						</h2>
 						<p
 							style={{
