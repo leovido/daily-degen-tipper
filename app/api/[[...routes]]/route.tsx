@@ -8,7 +8,6 @@ import { serveStatic } from "frog/serve-static";
 import { vars } from "./ui";
 import { type FCUser, client } from "./client";
 import { type DegenResponse } from "./types";
-import { boostedChannels } from "./pill";
 import { kv } from "@vercel/kv";
 
 interface State {
@@ -119,13 +118,6 @@ const generateIntents = (
 ) => {
 	switch (pageState) {
 		case PageState.EMPTY: {
-			const url = "https://warpcast.com/~/channel";
-
-			const randomChannel =
-				boostedChannels[Math.floor(Math.random() * boostedChannels.length)];
-
-			const updatedURL = `${url}${randomChannel.toLowerCase()}`;
-
 			return [
 				isSearchMode ? (
 					<Button action="/" value="restart">
@@ -137,9 +129,6 @@ const generateIntents = (
 					</Button>
 				),
 				<Button.Link href="https://degen.tips">Visit degen.tips</Button.Link>,
-				<Button.Link href={updatedURL}>
-					Visit random boosted channel
-				</Button.Link>,
 				tipButton()
 			];
 		}
