@@ -37,6 +37,7 @@ const bodyColor = "#6B4E31";
 const footerColor = "#593E23";
 
 const app = new Frog<{ State: State }>({
+	title: "Who did I tip",
 	initialState: initialState,
 	imageAspectRatio: "1:1",
 	assetsPath: "/",
