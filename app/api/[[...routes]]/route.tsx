@@ -1,7 +1,7 @@
 /** @jsxImportSource frog/jsx */
 
 import React from "react";
-import { Button, Frog, TextInput } from "frog";
+import { Button, Frog } from "frog";
 import { devtools } from "frog/dev";
 import { handle } from "frog/next";
 import { serveStatic } from "frog/serve-static";
@@ -107,9 +107,9 @@ const fetchExistingItems = async (fid: number) => {
 	};
 };
 
-const textInput = () => {
-	return <TextInput placeholder="Search any FID, e.g. 203666" />;
-};
+// const textInput = () => {
+// 	return <TextInput placeholder="Search any FID, e.g. 203666" />;
+// };
 
 const generateIntents = (
 	pageState: PageState,
@@ -311,7 +311,7 @@ app.frame("/", async (c) => {
 			</div>
 		),
 		intents: [
-			textInput(),
+			// textInput(),
 			<Button action="/check" value="myTips">
 				My tips
 			</Button>,
