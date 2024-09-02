@@ -182,7 +182,7 @@ const generateIntents = (
 
 const app = new Frog<{ State: State }>({
 	title: "Who did I tip today?",
-	verify: false,
+	verify: true,
 	initialState: initialState,
 	imageAspectRatio: "1:1",
 	assetsPath: "/",
