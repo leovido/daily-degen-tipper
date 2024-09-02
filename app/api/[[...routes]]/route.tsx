@@ -192,7 +192,8 @@ const generateIntents = (
 };
 
 const app = new Frog<{ State: State }>({
-	verify: process.env.CONFIG === "PROD",
+	title: "Who did I tip today?",
+	verify: false,
 	initialState: initialState,
 	imageAspectRatio: "1:1",
 	assetsPath: "/",
@@ -306,7 +307,7 @@ app.frame("/", async (c) => {
 						marginTop: -24
 					}}
 				>
-					Season 6
+					Season 8
 				</h1>
 				<h4
 					style={{
